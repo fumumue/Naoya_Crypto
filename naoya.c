@@ -53,42 +53,84 @@ ginit(void)
     memcpy(g, gg, sizeof(g));
 }
 
-// OP型からベクトル型への変換
-vec o2v(OP f)
+
+// 有限体の元の平方を計算する
+int isqrt(short u)
 {
-    vec a = {0};
-    int i;
+  int i, j, k;
 
-    for (i = 0; i < K * E; i++)
-    {
-        if (f.t[i].a > 0 && f.t[i].n < K * E)
-            a.x[f.t[i].n] = f.t[i].a;
-    }
+  for (i = 0; i < N; i++)
+  {
+    if ((i*i)%N == u)
+      return i;
+  }
 
-    return a;
+  printf("来ちゃいけないところに来ました\n");
+  exit(1);
 }
 
-// ベクトル型からOP型への変換
-OP v2o(vec a)
-{
-    int i, j = 0;
-    OP f = {0};
+//内積
+int intermul(vec a,vec b){
+int i;
+int c=0;
 
-    // #pragma omp parallel for
-    for (i = 0; i < K * E; i++)
-    {
-        if (a.x[i] > 0)
-        {
-            f.t[j].n = i;
-            f.t[j++].a = a.x[i];
-        }
-    }
+for(i=0;i<K;i++)
+c+=(a.x[i]*b.x[i])%N;
 
-    return f;
+return c%N;
 }
 
+// ベクトルのノルム
+int norm(vec a){
+int i,n=0;
+
+n+=a.x[i]*a.x[i]%N;
+n=isqrt(n);
+
+return n;
+}
+
+unsigned short gcd(unsigned short a, unsigned short b)
+{
+  int r, tmp;
+
+  /* 自然数 a > b を確認・入替 */
+  if (a < b)
+  {
+    tmp = a;
+    a = b;
+    b = tmp;
+  }
+
+  /* ユークリッドの互除法 */
+  r = (a % b);
+  while (r != 0)
+  {
+    a = b;
+    b = r;
+    r = (a % b);
+  }
+
+  /* 最大公約数を出力 */
+  //printf("最大公約数 = %d\n", b);
+  if(b!=1)
+  {
+    printf("(a,b)!=1\n");
+    return -1;
+  }
+
+  return b;
+}
+
+
+// 整数の逆数
 short inv(short a, short n)
 {
+
+    if(gcd(a,n)!=1){
+        printf("(a,n)!=1\n");
+        return -1;
+    }
     short d = n;
     short x = 0;
     short s = 1;
@@ -103,35 +145,10 @@ short inv(short a, short n)
         s = t;
     }
     short gcd = d; // $\gcd(a, n)$
-    if(d<=0)
-    exit(1);
+
     return ((x + n) % (n / d));
 }
 
- short oinv(short a,  short n)
-{
-     short i;
-
-    if (a == 0)
-        return 0;
-    if (a < 0)
-    {
-        //printf("a=%d", a);
-        a = N + a%N;
-        //printf("-a=%d\n", a);
-        // exit(1);
-    }
-    // if (a == 1)
-    //     return 1;
-    for (i = 1; i < n; i++)
-    {
-        if ((i * a) % N == 1)
-            return i;
-    }
-
-    printf("no return1\n");
-    exit(1);
-}
 
  short oinv2(short a, int R)
 {
@@ -258,7 +275,7 @@ vec kof2( short c, vec f)
     int i, k;
     vec b = {0}, h = {0};
 
-    c = oinv(c, N);
+    c = inv(c, N);
     printf("c=%d\n", c);
     // exit(1);
     b = f; // o2v(f);
@@ -346,32 +363,10 @@ vec convolution( vec a, vec b, int n ) {
 }
 
 
-int mul = 0, mul2 = 0;
-vec vmul(vec a, vec b,int R)
-{
-    int i, j, k, l;
-    vec c = {0};
-
-    k = deg(a);
-    l = deg(b);
-
-    i = 0;
-    while (i < k + 1)
-    {
-        for (j = 0; j < l + 1; j++)
-        {
-            if (a.x[i] > 0)
-                c.x[i + j] = (c.x[i + j] + a.x[i] * b.x[j]) % R;
-        }
-        i++;
-    }
-
-    return c;
-}
-
  short vb[K * 2][N] = {0};
  short gt[K * 2][K * 2] = {0};
 
+ // RS-Code generater
 void van(int kk)
 {
     int i, j;
@@ -520,7 +515,7 @@ void printsage(vec a)
     {
         if (a.x[i] != 0)
         {
-            printf("%d*X**%d+", a.x[i], i); // for GF(2^m)
+            printf("+%d*X**%d", a.x[i], i); // for GF(2^m)
         }
     }
 }
@@ -843,30 +838,30 @@ vec vmod2(vec f, vec g,int R)
     return f;
 }
 
-// int mul = 0, mul2 = 0;
-vec vmul_2(vec a, vec b)
+int mul = 0, mul2 = 0;
+vec vmul(vec a, vec b,int R)
 {
     int i, j, k, l;
     vec c = {0};
-    if (deg(a) > 128 && deg(b) > 128)
-        mul++;
-    mul2++;
 
     k = deg(a);
     l = deg(b);
 
-    for (i = 0; i < k + 1; i++)
+    i = 0;
+    while (i < k + 1)
     {
         for (j = 0; j < l + 1; j++)
-        // if (a.x[i] > 0)
         {
-            c.x[i + j] += (a.x[i] * b.x[j]) % N;
-            c.x[i + j] %= N;
+            if (a.x[i] > 0)
+                c.x[i + j] = (c.x[i + j] + a.x[i] * b.x[j]) % R;
         }
+        i++;
     }
 
     return c;
 }
+
+
 
 // 多項式のべき乗
 vec opow(vec f, int n)
@@ -877,7 +872,7 @@ vec opow(vec f, int n)
     g = f;
 
     for (int i = 1; i < n; i++)
-        g = vmul_2(g, f);
+        g = vmul(g, f,N);
 
     return g;
 }
@@ -892,8 +887,8 @@ vec vpowmod(vec f, vec mod, int n)
     while (n > 0)
     {
         if (n % 2 == 1)
-            ret = vmod(vmul_2(ret, f), mod); // n の最下位bitが 1 ならば x^(2^i) をかける
-        f = vmod(vmul_2(f, f), mod);
+            ret = vmod(vmul(ret, f,N), mod); // n の最下位bitが 1 ならば x^(2^i) をかける
+        f = vmod(vmul(f, f,N), mod);
         n >>= 1; // n を1bit 左にずらす
     }
     return ret;
@@ -943,6 +938,7 @@ short diag(MTX a, int n)
     return (a.x[n][n] * a.x[n + 1][n + 1] - a.x[n][n + 1] * a.x[n + 1][n]) % N;
 }
 
+// resultant（シルベスター行列）
 int resl(vec f, vec g)
 {
     MTX a = {0};
@@ -1076,7 +1072,7 @@ vec vpp(vec f, vec mod, int n)
     // 繰り返し２乗法
     for (i = 1; i < n; i++)
     {
-        s = vmod(vmul_2(s, f), mod);
+        s = vmod(vmul(s, f,N), mod);
     }
 
     return s;
@@ -1124,8 +1120,8 @@ MTX inverseMatrix(MTX A, MTX A_inv, int start_row, int end_row)
         temp = A.x[k][k];
         for (j = 0; j < K / 2 + 1; j++)
         {
-            A.x[k][j] = A.x[k][j] * oinv(temp, N) % N;
-            A_inv.x[k][j] = A_inv.x[k][j] * oinv(temp, N) % N;
+            A.x[k][j] = A.x[k][j] * inv(temp, N) % N;
+            A_inv.x[k][j] = A_inv.x[k][j] * inv(temp, N) % N;
         }
         for (i = start_row; i < end_row; i++)
         {
@@ -1276,7 +1272,7 @@ vec opowmod(vec f, vec mod, int n)
     for (int i = 1; i < n; i++)
     {
         // f = vmul(f, f);
-        g = vmul_2(g, f);
+        g = vmul(g, f,N);
         if (deg(g) > deg(mod))
         {
             // printsage(g);
@@ -1633,6 +1629,7 @@ aa:
     return (w);
 }
 
+// Goppa Code's Parity Check (Berlekamp type)
 void vv(int kk)
 {
     int i, j;
@@ -1780,37 +1777,6 @@ typedef struct
     vec h;
 } ymo;
 
-vec pmul(vec a, vec b)
-{
-    int i, j, k, l;
-    vec c = {0};
-
-    k = deg(a) + 1;
-    l = deg(b) + 1;
-    printf("k=%d,l=%d", k, l);
-    // exit(1);
-    for (int i = 0; i < k; i++)
-    {
-        for (int j = 0; j < l; j++)
-            if (a.x[i] > 0)
-            {
-                c.x[i + j] = (c.x[i + j] + a.x[i] * b.x[j]) % N;
-                // printf("%d=c ",c.x[i+j]);
-            }
-        // printf("\n");
-    }
-    /*
-    printf("\n");
-    printpol(v2o(c));
-    printf(" ==c\n");
-    printpol(v2o(a));
-    printf(" ==a\n");
-    printpol(v2o(b));
-    printf(" ==b\n");
-    // exit(1);
-    */
-    return c;
-}
 
 vec bms( short s[])
 {
@@ -1833,8 +1799,8 @@ vec bms( short s[])
             v.x[k - m] = 1;
 
              short a;
-            a = (m < 0) ? 1 : oinv(d[m],N);
-            f = vadd(f, vmul_2(kof2((d[k]* a), g), v));
+            a = (m < 0) ? 1 : inv(d[m],N);
+            f = vadd(f, vmul(kof2((d[k]* a), g), v,N));
             if (L <= k / 2)
             {
                 L = k + 1 - L;
@@ -1886,7 +1852,7 @@ ymo bm_itr( short s[])
             }
             U1[0][0].x[p] = 1;
             U1[0][1].x[0] = N - (myu);
-            U1[1][0].x[0] = oinv(myu, N);
+            U1[1][0].x[0] = inv(myu, N);
             U1[1][1].x[0] = 0;
         }
         for (int i = 0; i < 2; i++)
@@ -1894,7 +1860,7 @@ ymo bm_itr( short s[])
             for (int j = 0; j < 2; j++)
             {
                 for (int k = 0; k < 2; k++)
-                    U2[1][i][j] = (vadd((U2[1][i][j]), (pmul(U1[i][k], U2[0][k][j]))));
+                    U2[1][i][j] = (vadd((U2[1][i][j]), (vmul(U1[i][k], U2[0][k][j],N))));
             }
         }
         memcpy(U2[0], U2[1], sizeof(U2[0]));
@@ -2020,7 +1986,7 @@ vec coeff(vec f,  short d)
 
   k = deg((f)) + 1;
   for (i = 0; i < k; i++)
-    f.x[i] = (f.x[i]*oinv(d,N))%N;
+    f.x[i] = (f.x[i]*inv(d,N))%N;
 
   return f;
 }
@@ -2171,6 +2137,7 @@ vec vdiv2(vec f, vec g,int R)
 /**
  *  f = f << 1 
  */
+//pieko
 vec shiftRotateL(vec f) {
     int i;
     short fn = f.x[deg(f) - 1];
@@ -2184,6 +2151,7 @@ vec shiftRotateL(vec f) {
 /**
  *  f = f >> 1 
  */   
+ //pieko
 vec shiftRotateR(vec f) {
     int i;
     short f0 = f.x[0];
@@ -2198,6 +2166,7 @@ int mod(int x, int R){
     return ((x % R) + R) % R;
 }
 
+//pieko
 vec inverse_prime( vec r, vec a, int p ) {
     int nn = deg(a);
 
@@ -2259,213 +2228,69 @@ vec inverse_prime( vec r, vec a, int p ) {
 // invert of polynomial
 vec vinv(vec a, vec n)
 {
-  vec d = {0}, x = {0}, s = {0}, q = {0}, r = {0}, t = {0}, u = {0}, v = {0}, w = {0}, tt = {0}, gcd = {0}, tmp = {0};
-  oterm b = {0};
-  vec vv = {0}, xx = {0},aa={0},bb={0},cc={0};
+    vec d = n;
+    vec x = {0};
+    vec s = {0};
+    vec t={0},r={0};
+    vec tt=n;
 
-  if (deg((a)) > deg((n)))
-  {
-    tmp = a;
-    a = n;
-    n = tmp;
-    printf("baka_i\n");
-    //exit (1);
-  }
-  if (vLT(a).a == 0)
-  {
-    printf(" a ga 0\n");
-    exit(1);
-  }
+    s.x[0]=1;
 
-  tt = n;
-
-  d = n;
-  x.x[0] = 0;
-  s.x[0] = 1;
-  while (deg((a)) > 0)
-  {
-    if (deg((a)) > 0)
-      r = vmod(d, a);
-    if (vLT(a).a == 0)
-      break;
-    if (vLT(a).a > 0)
-      q = vdiv(d, a);
-
+    while (deg(a)>0)
+    {
+        vec q = vdiv(d , a);
+        r = vmod(d , a);
+        d = a;
+        a = r;
+        t = vsub(x, vmul(q, s,N));
+        x = s;
+        s = t;
+    }
     d = a;
     a = r;
-    t = vsub(x, vmul_2(q, s));
-
     x = s;
     s = t;
-  }
-  d = a;
-  a = r;
-
-  x = s;
-  s = t;
-
-  gcd = d; // $\gcd(a, n)$
-  printpol((gcd));
-  printf(" =========gcd\n");
-
-  printf("before vinv\n");
-  //w=tt;
-
-  b = vLT(w);
-
-  aa=(x);
-  bb=(n);
-  cc = vadd(aa, bb);
-  v=(cc);
-  w = tt;
-  if (vLT(v).n > 0 && vLT(w).n > 0)
-  {
-    u = vmod(v, w);
-  }
-  else
-  {
-    //printpol (o2v (v));
-    printf(" v===========\n");
-    //printpol (o2v (x));
-    printf(" x==0?\n");
-    //printpol (o2v (n));
-    printf(" n==0?\n");
-
-    exit(1);
-  }
-  //caution !!
-  if (vLT(u).a > 0 && vLT(d).a > 0)
-  {
-    u = vdiv(u, d);
-  }
-
-  if (vLT(u).a == 0 || vLT(d).a == 0)
-  {
-    printf("inv div u or d==0\n");
-    // exit(1);
-  }
-  if (vLT(u).a == 0)
-  {
-    printf("no return at u==0\n");
-    exit(1);
-  }
-
-  return u;
+    
+    vec gcd = d; // $\gcd(a, n)$
+    vec u=vmod(vadd(x , n),tt);
+    u=vdiv(u, d);
+ 
+    return  u;
 }
 
-
-// invert of polynomial
+// invert of polynomial mod R
 vec vinv2(vec a, vec n,int R)
 {
-  vec d = {0}, x = {0}, s = {0}, q = {0}, r = {0}, t = {0}, u = {0}, v = {0}, w = {0}, tt = {0}, gcd = {0}, tmp = {0};
-  oterm b = {0};
-  vec vv = {0}, xx = {0},aa={0},bb={0},cc={0};
+    vec d = n;
+    vec x = {0};
+    vec s = {0};
+    vec t={0},r={0};
+    vec tt=n;
 
-  if (deg((a)) > deg((n)))
-  {
-    tmp = a;
-    a = n;
-    n = tmp;
-    printf("baka_i\n");
-    //exit (1);
-  }
-  if (vLT(a).a == 0)
-  {
-    printf(" a ga 0\n");
-    exit(1);
-  }
+    s.x[0]=1;
 
-  tt = n;
-
-  d = n;
-  x.x[0] = 0;
-  s.x[0] = 1;
-  while (deg((a)) > 0)
-  {
-    if (deg((a)) > 0)
-      r = vmod2(d, a,R);
-    if (vLT(a).a == 0)
-      break;
-    if (vLT(a).a > 0)
-      q = vdiv2(d, a,R);
-
+    while (deg(a)>0)
+    {
+        vec q = vdiv2(d , a,R);
+        r = vmod2(d , a,R);
+        d = a;
+        a = r;
+        t = vsub2(x, vmul(q, s,R),R);
+        x = s;
+        s = t;
+    }
     d = a;
     a = r;
-    t = vsub2(x, vmul(q, s,R),R);
-
     x = s;
     s = t;
-  }
-  d = a;
-  a = r;
-
-  x = s;
-  s = t;
-
-  gcd = d; // $\gcd(a, n)$
-  printpol((gcd));
-  printf(" =========gcd\n");
-
-  printf("before vinv\n");
-  //w=tt;
-
-  b = vLT(w);
-
-  aa=(x);
-  bb=(n);
-    printpol(aa);
-    printf(" 3!\n");
-    printpol(bb);
-    printf(" 3!\n");
-  cc = vadd2(aa, bb,R);
-    printpol(cc);
-    printf(" 3!\n");
-  v=(cc);
-  w = tt;
-  if (vLT(v).n > 0 && vLT(w).n > 0)
-  {
-    printpol(v);
-    printf("\n");
-    printpol(w);
-    printf("\n");
-    u = vmod2(v, w,R);
-    printpol(u);
-    printf("\n");
-  }
-  else
-  {
-    //printpol (o2v (v));
-    printf(" v===========\n");
-    //printpol (o2v (x));
-    printf(" x==0?\n");
-    //printpol (o2v (n));
-    printf(" n==0?\n");
-
-    exit(1);
-  }
-  //caution !!
-  if (vLT(u).a > 0 && vLT(d).a > 0)
-  {
-    printpol(u);
-    printf(" ==vinv2-u\n");
-    printpol(d);
-    printf(" ==vinv2-d\n");
-    u = vdiv2(u, d,R);
-  }
-
-  if (vLT(d).a == 0)
-  {
-    printf("2! inv div d==0\n");
-    // exit(1);
-  }
-  if (vLT(u).a == 0)
-  {
-    printf("2! no return at u==0\n");
-    exit(1);
-  }
-
-  return u;
+    
+    vec gcd = d; // $\gcd(a, n)$
+    vec u=vmod2(vadd2(x , n,R),tt,R);
+    u=vdiv2(u, d,R);
+ 
+    return  u;
 }
+
 
 vec trim(vec a,int R){
     int i;
@@ -2502,17 +2327,6 @@ vec deli(vec a, vec b)
 
   vec v = {0};
 
-  // printpol(a);
-  // printf(" ==a\n");
-  // printpol(b);
-  /*
-  if(deg(b)>deg(a)){
-  printf(" ==b\n");
-  printf("deg(b)=%d %d\n",deg(b),deg(a));
-  return a;
-  //exit(1);
-  }
-  */
   for (int i = 0; i < deg(b); i++)
     v.x[i] = a.x[i];
 
@@ -2527,14 +2341,14 @@ vec vcoef(vec v)
   // return v;
 
   if (v.x[0] > 1)
-    n = oinv(v.x[0],N);
+    n = inv(v.x[0],N);
   for (int i = 0; i < k + 1; i++)
     v.x[i] = n*v.x[i]%N;
 
   return v;
 }
 
-// ニュートン法で逆元を求める
+// ニュートン法で逆元を求める (something buggy)
 vec invpol(vec a)
 {
   vec v = {0}, x = {0},g={0},f={0};
@@ -2552,16 +2366,16 @@ vec invpol(vec a)
   i = 1;
   while (i < K+1)
   {
-    g=vsub(vmul_2(g,f),vmul_2(a,vmul_2(g,g)));
+    g=vsub(vmul(g,f,N),vmul(a,vmul(g,g,N),N));
     //v = vmul(vmul(v, v), a);
     if (i > 1)
-      x = vmul_2(x, x);
+      x = vmul(x, x,N);
     g = deli(g, x);
     i*=2;
     printpol(g);
     printf(" ('A`)\n");
   }
-  if(vmul_2(a,g).x[0]!=1)
+  if(vmul(a,g,N).x[0]!=1)
   {
     printf("baka inv\n");
     //exit(1);
@@ -2614,29 +2428,6 @@ vec invpol2(vec a,vec I,int R)
 }
 
 
-vec polinv(vec a, vec n)
-{
-    vec d = n;
-    vec x = {0};
-    vec s = {0};
-    
-    s.x[0]=1;
-
-    while (a.x[0] != 0 && deg(a)>0)
-    {
-        vec q = vdiv(d , a);
-        vec r = vmod(d , a);
-        d = a;
-        a = r;
-        vec t = vmul_2(vsub(x , q), s);
-        x = s;
-        s = t;
-    }
-    vec gcd = d; // $\gcd(a, n)$
-
-    return vmod(vadd(x , n) , vdiv(n , d));
-}
-
 
 #define P 32
 int main()
@@ -2660,11 +2451,10 @@ int main()
     printf(" wooooow%d\n",30*31%32);
         printpol(vmod2(vmul(xx,trim(I2,32),32),I,32));
     printf(" E2\n");
-        printpol(vmod(vmul_2(vinv(I2,I),I2),I));
+        printpol(vmod(vmul(vinv(I2,I),I2,N),I));
     printf("\n");
     exit(1);
 
-    //exit(1);
     //xx=mkpol3(10,32);
     //v=vmod2(I,trim(I3,31),31);
     //v=vinv2(I2,I,3);
@@ -2676,10 +2466,6 @@ int main()
     //v=vinv2(I2,I,P);
 
     srand(clock());
-    // mkg(K); // Goppa Code (EEA type)
-    // van(K); // RS-Code generate
-    // mkd(f, K);
-    // vv(K);           // Goppa Code's Parity Check (Berlekamp type)
 
     // resl(v,x);
     // exit(1);
