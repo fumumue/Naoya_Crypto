@@ -7,23 +7,14 @@
 
 
 #define MAX 2 // 素数表の先頭から何個素数を足すか
-#define NN N  // 置換配列の次元
+#define NN 8  // 置換配列の次元
 
-int P[DEG] = {0};
-int inv_P[DEG]={0};
-short x[5][DEG]={0};
-
+int P[N] = {0};
+int inv_P[N]={0};
+short x[5][N]={0};
 
 #define str_length 128
 #define password_length 256
-
-typedef struct {
-  unsigned short p;
-  unsigned short q;
-  unsigned short r;
-} heme2;
-
-heme2 oo[DEG]={0};
 
 #define SIZE_OF_ARRAY(array) (sizeof(array) / sizeof(array[0]))
 #define SWAP(type, a, b) \
@@ -71,7 +62,7 @@ void printArray(const int *array, size_t size)
   printf("\n");
 }
 
-short p[DEG]={0};
+short p[N]={0};
 void mkcycle()
 {
   int i, j, pko, flg2, l, n, ll,  cnt3 = 0, ii;
@@ -451,18 +442,6 @@ void random_shuffle(unsigned short *array, size_t size)
     SWAP(int, array[a], array[b]);
   }
 }
-
-void rr(heme2 *array, size_t size)
-{
-  for (size_t i = size; i > 1; --i)
-  {
-    size_t a = i - 1;
-    size_t b = rand() % i;
-    SWAP(int, array[a].p, array[b].p);
-  }
-}
-
-
 
 /*
     配列の要素を出力

@@ -26,7 +26,7 @@ typedef struct {
 
 typedef struct
 {
-   short v[DEG];
+   short v[N];
   int f;
 } MT;
 
@@ -55,7 +55,7 @@ typedef union
 
 typedef union
 {
-   long long int u[DEG];
+   long long int u[N];
    char d[N * 8];
 } arrayull;
 
@@ -100,17 +100,60 @@ typedef struct pub
 
 #define R(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
 
-
+/*
  int rotate_left( int x, int n)
 {
   assert(0 < n && n < 32);
   return (x << n) | (x >> (32 - n));
 }
+*/
+/*
+typedef union
+{
+   long long int u[8];
+   char d[64];
+} arrayul;
+
+typedef struct a4
+{
+   char ar[4];
+} array;
+
+typedef struct a8
+{
+   char ar[8];
+} array8;
+
+typedef struct
+{
+   int h[16];
+} array16;
+
+typedef struct aN
+{
+   char ar[N];
+} arrayn;
+
+typedef struct pub
+{
+   char a[N];
+   char b[N];
+} set;
+*/
 
 typedef struct {
-   short x[DEG][DEG];
+   short x[N][N];
   OP f;
   int row; //行
   int col; //列
 } MTX;
 
+/*
+typedef struct {
+   short x[N][K];
+   char z[N][K*E];
+   char w[K*E][K*E];
+  int i;
+  int rank;
+} MAT;
+*/

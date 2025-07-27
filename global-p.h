@@ -5,10 +5,10 @@
 //符号のパラーメータの指定。通常[N,K,T]として、
 //Nは符号の長さ、Kが符号の次元、Tは訂正エラー数
 //を表す。ここではDは符号長にしている。
-#define N 1129 //1187,1129,887 set small prime
+#define N 31 // set small prime
 #define M N // order of group
-#define K (10) // degree of polynomial
-#define E (11)   // bit size of prime
+#define K (6) // degree of polynomial
+#define E (5)   // bit size of prime
 #define DEG N // set (K * E) < N
 #define T (K / 2) // weight of error vector
 
