@@ -14,6 +14,8 @@
 #include "global-p.h"
 #include "struct.h"
 #include "chash-p.c"
+#include "golay.c"
+
 
 #define SEPARABLE 0
 #define MATRIX_SIZE 16
