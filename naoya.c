@@ -203,7 +203,7 @@ int deg(vec a)
 // 多項式を表示する(default)
 void printpol(vec a)
 {
-    int i, n;
+    int i, n,flg=0;
 
     n = deg(a);
 
@@ -214,11 +214,11 @@ void printpol(vec a)
     {
         if (a.x[i] != 0)
         {
-            if (a.x[i] > 0 && i<n)
-            printf("+");
             printf("%d*", a.x[i]);
             // if (i > 0)
             printf("x^%d", i);
+            if(i>0)
+            printf("+");
         }
     }
     //  printf("\n");
@@ -509,7 +509,7 @@ vec mkpol()
 
 void printsage(vec a)
 {
-    int i, j;
+    int i, j=deg(a),flg=0;
     oterm b;
 
     printf("poly=");
@@ -517,7 +517,13 @@ void printsage(vec a)
     {
         if (a.x[i] != 0)
         {
-            printf("+%d*X**%d", a.x[i], i); // for GF(2^m)
+            printf("%d*", a.x[i]);
+            // if (i > 0)
+            printf("x^%d", i);
+            if (i < j)
+            printf("+");
+            flg=1;
+            //printf("+%d*X**%d", a.x[i], i); // for GF(2^m)
         }
     }
 }
@@ -1403,7 +1409,7 @@ aa:
         goto aa;
     printsage((w));
     printf("\n");
-    //exit(1);
+    exit(1);
     //     printf("wwwwwww\n");
     //  exit(1);
     //  separable gvecpa code
@@ -2448,14 +2454,19 @@ int main()
     vec vv = {0},m={1,0,1,0,1,0,1,0,1,0,0,0,1,0,1},I={P-1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0},II={1,0,1,-1,-1,1,-1,0,1,1,-1,-1,0,1,0,0,0},I2={P-1,1,1,0,P-1,0,1,0,0,1,P-1,0,0,0,0,0,0},I3={31,1,1,0,31,0,1,0,0,1,31,0,0,0,0,0,0},J={0,0,0,0,2};
     vec xx={5,9,6,16,4,15,16,22,20,18,30};
 
-    h.x[7]=1;
+
     I2=mkpol(K);
     printf(" wooooow%d\n",30*31%32);
-        printpol(vmod2(vmul(xx,trim(I2,32),32),I,32));
+    printpol(vmod2(vmul(xx,trim(I2,32),32),I,32));
     printf(" E2\n");
-        printpol(vmod(vmul(vinv(I2,I),I2,N),I));
+    // if N is Prime
+    printpol(vmod(vmul(vinv(I2,I),I2,N),I));
     printf("\n");
+    // if N is not Prime
+    //printpol((vmul(invpol(I2),I2,P)));
+    //printf("\n");
     exit(1);
+    h.x[7]=1;
 
     //xx=mkpol3(10,32);
     //v=vmod2(I,trim(I3,31),31);
@@ -2467,7 +2478,6 @@ int main()
     //v=invpol((I3),32);
     //v=vinv2(I2,I,P);
 
-    srand(clock());
 
     // resl(v,x);
     // exit(1);
@@ -2482,10 +2492,7 @@ int main()
         // mkerr(z1, T);    // generate error vector
         for (int i = 0; i < T; i++)
             z1[i] = i+1;
-        //z1[1] = 1;
-        //z1[2] = 2;
-        //z1[3] = 3;
-        //z1[4] = 1;
+
         x = synd(z1, K); // calc syndrome
         vec r={0};
         //vec r = bms(x.x);    // Berlekamp-Massey Algorithm
