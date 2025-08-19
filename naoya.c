@@ -96,6 +96,8 @@ unsigned short gcd(unsigned short a, unsigned short b)
 {
   int r, tmp;
 
+  if(b==0 || a==0)
+  return 0;
   /* 自然数 a > b を確認・入替 */
   if (a < b)
   {
@@ -104,6 +106,7 @@ unsigned short gcd(unsigned short a, unsigned short b)
     b = tmp;
   }
 
+    //b=N;
   /* ユークリッドの互除法 */
   r = (a % b);
   while (r != 0)
@@ -1381,7 +1384,7 @@ int ben_or(vec f)
     return 0;
 }
 
-vec mkd(vec w, int kk, int start, int end)
+vec mkd(vec w, int kk)
 {
     int i, j, k, l, ii = 0;
 
@@ -1404,7 +1407,8 @@ aa:
     // irreducible gvecpa code (既役多項式が必要なら、ここのコメントを外すこと。)
 
     w = mkpol(K);
-    l = ben_or((w));
+    //l = ben_or((w));
+    l=0;
     while (l == -1)
         goto aa;
     printsage((w));
@@ -1423,7 +1427,7 @@ aa:
     // exit(1);
 
     // 多項式の値が0でないことを確認
-    for (int i = start; i < end; i++)
+    for (int i = 0; i < K; i++)
     {
         ta[i] = trace(w, i);
         if (ta[i] == 0)
@@ -1434,7 +1438,7 @@ aa:
             goto aa;
         }
     }
-    for (int i = start; i < end; i++)
+    for (int i = 0; i < K; i++)
     {
         tr[i] = inv(ta[i], N);
         // printf("%d,", tr[i]);
@@ -1462,7 +1466,7 @@ aa:
     // keygen(g);
     // exit(1);
 
-    for (int j = start; j < end; j++)
+    for (int j = 0; j < K; j++)
     {
         for (int i = 0; i < M; i++)
         {
@@ -1470,7 +1474,7 @@ aa:
         }
     }
 
-    for (int i = start; i < end; i++)
+    for (int i = 0; i < K; i++)
     {
         for (int j = 0; j < M; j++)
         {
@@ -2436,7 +2440,6 @@ vec invpol2(vec a,vec I,int R)
 }
 
 
-
 int main()
 {
     int i, u = 0;
@@ -2453,7 +2456,8 @@ int main()
     vec vv = {0},m={1,0,1,0,1,0,1,0,1,0,0,0,1,0,1},I={0},II={1,0,1,-1,-1,1,-1,0,1,1,-1,-1,0,1,0,0,0},I2={Q-1,1,1,0,Q-1,0,1,0,0,1,Q-1,0,0,0,0,0,0},I3={31,1,1,0,31,0,1,0,0,1,31,0,0,0,0,0,0},J={0,0,0,0,2};
     vec xx={5,9,6,16,4,15,16,22,20,18,30};
 
-
+    printf("%b\n",N);
+    //exit(1);
     fugo();
     //exit(1);
     I.x[0]=Q-1;
@@ -2485,7 +2489,8 @@ int main()
     // resl(v,x);
     // exit(1);
 
-    mkd(f, K, 0, K);
+    mkd(f, K);
+    //exit(1);
 
     while (1)
     {
@@ -2506,7 +2511,7 @@ int main()
         //r.x[K-1-i]=y.f.x[i];
         x=chen(y.f);
         //chen(r);
-        // exit(1);
+         //exit(1);
          for(i=0;i<N;i++)
          if(z1[i]>0)
          printf("i=%d\n",i);
@@ -2533,6 +2538,7 @@ int main()
             }
         }
         */
+        //exit(1);
         x=ev(x,v);
         //exit(1);
         int flg = 0,yo=0;
