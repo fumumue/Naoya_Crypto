@@ -7,11 +7,11 @@
 //を表す。ここではDは符号長にしている。
 #define N 257 // set small prime
 #define M N // order of group
-#define K (16) // degree of polynomial
+#define K (32) // degree of polynomial
 #define E (5)   // bit size of prime
 #define DEG N // set (K * E) < N
 #define T (K / 2) // weight of error vector
-
+#define Q K*2
 
 unsigned short mat[N][K*E] = {0};
 unsigned short ma[N][K*E] = {0};

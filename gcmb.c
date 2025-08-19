@@ -3,8 +3,8 @@
 
 /* $BAH9g$;$N@8@.(B: $B%l%8%9%?$r;H$C$?9bB.HG!#(B */
 
-#define N 23
-#define K 3
+#define NN 23
+#define KK 3
 
 
 /* [23,12,7]-�g���S�[���C���� 
@@ -24,8 +24,8 @@ unsigned int ht[11]={
 */
 
 unsigned int count,count2;
-typedef unsigned int set;
-#define first(n) ((set) ((1U << (n)) - 1U))
+typedef unsigned int seti;
+#define first(n) ((seti) ((1U << (n)) - 1U))
 typedef struct {
   int x[4096];
 } tri;
@@ -86,9 +86,9 @@ int codec(int mm){
 }
 
 int vx[2048]={0};
-set nextset(set x)
+seti nextset(seti x)
 {
-  set smallest,ripple,n_small,ones;
+  seti smallest,ripple,n_small,ones;
   
   smallest=x& -x;
   ripple=x+smallest;
@@ -99,7 +99,7 @@ set nextset(set x)
 
 tri ple={0};
 int uu=0;
-tri printest(set s,int t1)
+tri printest(seti s,int t1)
 {
   int i,l,k=0;
   unsigned int b=0,j;
@@ -108,7 +108,7 @@ tri printest(set s,int t1)
   unsigned short tmp=0;
   unsigned vv=0;
 
-  for(i=0;i<N;i++){
+  for(i=0;i<NN;i++){
     if(k==t1)
       k=0;
     if(s&1){
@@ -145,7 +145,7 @@ printf("\n");
 
 int fugo(void){
   int i,j;
-  set x;
+  seti x;
   int t1;
 
 
