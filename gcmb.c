@@ -7,8 +7,8 @@
 #define KK 3
 
 
-/* [23,12,7]-�g���S�[���C���� 
-unsigned int ht[11]={
+/* [23,12,7]-�g���S�[���C���� */
+unsigned int ht2[11]={
 0b10000000000111110010010,
 0b01000000000011111001001,
 0b00100000000110001110110,
@@ -21,7 +21,7 @@ unsigned int ht[11]={
 0b00000000010000101101111,
 0b00000000001111100100101
 };
-*/
+
 
 unsigned int count,count2;
 typedef unsigned int seti;
@@ -68,8 +68,8 @@ int sind(int c){
   int ss=0;
       for(i=0;i<11;i++){
       ss<<=1;
-    ss^=__builtin_popcount(c&ht[i])%2;
-    printf("%d,",__builtin_popcount(c&ht[i])%2);
+    ss^=__builtin_popcount(c&ht2[i])%2;
+    printf("%d,",__builtin_popcount(c&ht2[i])%2);
     }
 return ss;
 }
@@ -133,10 +133,10 @@ int i,j,k=0;
 for(j=0;j<23;j++){
   k=0;
   for(i=0;i<11;i++){
-  printf("%d",(ht[i]%2));
+  printf("%d",(ht2[i]%2));
   k<<=1;
-  k^=ht[i]&(1);
-  ht[i]=ht[i]>>1;
+  k^=ht2[i]&(1);
+  ht2[i]=ht2[i]>>1;
   }
 printf("%d=%d %b\n",j,k,k);
 printf("\n");
@@ -153,7 +153,7 @@ int fugo(void){
 for(t1=1;t1<4;t1++)
 {
  x=first(t1);
-  while(! (x & ~first(N))){
+  while(! (x & ~first(NN))){
     printf("%4d:",i); 
     tri vx=printest(x,t1);
     x=nextset(x); i++;
@@ -176,8 +176,8 @@ int e=0;
         ss=0;
     for(i=0;i<11;i++){
       ss<<=1;
-    ss^=__builtin_popcount(ple.x[j]&ht[i])%2;
-    printf("%d,",__builtin_popcount(ple.x[j]&ht[i])%2);
+    ss^=__builtin_popcount(ple.x[j]&ht2[i])%2;
+    printf("%d,",__builtin_popcount(ple.x[j]&ht2[i])%2);
     }
     if(sindy[ss]==0){
     sindy[ss]=ple.x[j];
@@ -210,7 +210,7 @@ int c=codec(517)^0b10000000000000100000001;
  }
 }
 //gappa();
-exit(1);
+//exit(1);
 
 
 return 0;

@@ -1409,7 +1409,7 @@ aa:
         goto aa;
     printsage((w));
     printf("\n");
-    exit(1);
+    //exit(1);
     //     printf("wwwwwww\n");
     //  exit(1);
     //  separable gvecpa code
@@ -2454,6 +2454,8 @@ int main()
     vec xx={5,9,6,16,4,15,16,22,20,18,30};
 
 
+    fugo();
+    //exit(1);
     I.x[0]=Q-1;
     I.x[K*2]=1;
     I2=mkpol(K);
@@ -2466,7 +2468,7 @@ int main()
     // if N is not Prime
     //printpol(deli(vmul(invpol(I2),I2,N),I));
     printf("\n");
-    exit(1);
+    //exit(1);
     h.x[7]=1;
 
     //xx=mkpol3(10,32);
