@@ -146,6 +146,7 @@ typedef struct {
   OP f;
   int row; //行
   int col; //列
+  int flg;
 } MTX;
 
 /*
