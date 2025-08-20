@@ -1110,6 +1110,31 @@ vec vgcd(vec xx, vec yy)
     return tt;
 }
 
+unsigned short oinv(short a, unsigned short n)
+{
+    unsigned short i;
+
+    if (a == 0)
+        return 0;
+    if (a < 0)
+    {
+        //printf("a=%d", a);
+        a = N + a%N;
+        //printf("-a=%d\n", a);
+        // exit(1);
+    }
+    // if (a == 1)
+    //     return 1;
+    for (i = 1; i < n; i++)
+    {
+        if ((i * a) % N == 1)
+            return i;
+    }
+    printf("no return\n");
+    exit(1);
+}
+
+
 // 行列の逆行列を計算する関数
 MTX inverseMatrix(MTX A, MTX A_inv, int start_row, int end_row)
 {
@@ -1131,8 +1156,8 @@ MTX inverseMatrix(MTX A, MTX A_inv, int start_row, int end_row)
         temp = A.x[k][k];
         for (j = 0; j < K / 2 + 1; j++)
         {
-            A.x[k][j] = A.x[k][j] * inv(temp, N) % N;
-            A_inv.x[k][j] = A_inv.x[k][j] * inv(temp, N) % N;
+            A.x[k][j] = A.x[k][j] * oinv(temp, N) % N;
+            A_inv.x[k][j] = A_inv.x[k][j] * oinv(temp, N) % N;
         }
         for (i = start_row; i < end_row; i++)
         {
@@ -1202,8 +1227,150 @@ MTX inverseMatrix(MTX A, MTX A_inv, int start_row, int end_row)
     return A_inv;
 }
 
+
 // #define NN 16
 vec sol(MTX a, int start, int end)
+{
+    int p, d;
+    int i, j, k;
+    vec v = {0};
+
+    for (i = start; i < end; i++)
+    {
+        p = a.x[i][i];
+
+        for (j = 0; j < (K / 2 + 1); j++)
+        {
+            a.x[i][j] = (a.x[i][j] * inv(p, N)) % N;
+        }
+
+        for (j = 0; j < K / 2; j++)
+        {
+            if (i != j)
+            {
+                d = a.x[j][i];
+
+                for (k = i; k < (K / 2 + 1); k++)
+                {
+                    if (a.x[j][k] > (d * a.x[i][k]) % N)
+                    {
+                        a.x[j][k] -= (d * a.x[i][k]) % N;
+                    }
+                    else
+                    {
+                        a.x[j][k] = (N + (a.x[j][k] - (d * a.x[i][k]) % N)) % N;
+                    }
+                }
+            }
+        }
+    }
+    vec x = {0};
+    for (i = start; i < end; i++)
+    {
+        if (N > a.x[i][K / 2])
+        {
+            x.x[K / 2 - i] = (N - a.x[i][K / 2]) % N;
+        }
+        else
+        {
+            x.x[K / 2 - i] = a.x[i][K / 2] % N;
+        }
+    }
+
+    x.x[0] = 1;
+
+    vec vv = {0};
+    vec pol = {0};
+    pol = setpol(x.x, K / 2 + 1);
+    printpol((pol));
+    printf(" ==key\n");
+    int key = 0;
+    for (i = 0; i < N; i++)
+    {
+        // v.x[i] = 0;
+        if (trace(pol, i) % N == 0)
+        {
+            printf("error position=%d\n", i);
+            vv.x[key++] = i;
+        }
+    }
+
+    return vv;
+}
+
+// #define NN 16
+vec sol3(MTX a, int start, int end)
+{
+    int p, d;
+    int i, j, k;
+    vec v = {0};
+
+    for (i = start; i < end; i++)
+    {
+        p = a.x[i][i];
+
+        for (j = 0; j < (K / 2 + 1); j++)
+        {
+            a.x[i][j] = (a.x[i][j] * inv(p, N)) % N;
+        }
+
+        for (j = 0; j < K / 2; j++)
+        {
+            if (i != j)
+            {
+                d = a.x[j][i];
+
+                for (k = i; k < (K / 2 + 1); k++)
+                {
+                    if (a.x[j][k] > (d * a.x[i][k]) % N)
+                    {
+                        a.x[j][k] -= (d * a.x[i][k]) % N;
+                    }
+                    else
+                    {
+                        a.x[j][k] = (N + (a.x[j][k] - (d * a.x[i][k]) % N)) % N;
+                    }
+                }
+            }
+        }
+    }
+    vec x = {0};
+    for (i = start; i < end; i++)
+    {
+        if (N > a.x[i][K / 2])
+        {
+            x.x[K / 2 - i] = (N - a.x[i][K / 2]) % N;
+        }
+        else
+        {
+            x.x[K / 2 - i] = a.x[i][K / 2] % N;
+        }
+    }
+
+    x.x[0] = 1;
+
+    vec vv = {0};
+    vec pol = {0};
+    pol = setpol(x.x, K / 2 + 1);
+    printpol((pol));
+    printf(" ==key\n");
+    int key = 0;
+    for (i = 0; i < N; i++)
+    {
+        // v.x[i] = 0;
+        if (trace(pol, i) % N == 0)
+        {
+            printf("error position=%d\n", i);
+            vv.x[key++] = i;
+        }
+    }
+
+    return vv;
+}
+
+
+// #define NN 16
+vec sol2(MTX a, int start, int end)
 {
     int p, d;
     int i, j, k;
@@ -1709,11 +1876,11 @@ void mkerr( short *z1, int num)
 
     j = 0;
 
-    memset(z1, 0, sizeof(2 * N));
+    memset(z1, 0, sizeof(2 * M));
 
     while (j < num)
     {
-        l = rand() % (N - 1);
+        l = rand() % (M - 1);
         // printf ("l=%d\n", l);
         if (0 == z1[l] && l > 0)
         {
@@ -1763,7 +1930,7 @@ vec chen(vec f)
      short z;
 
     n = deg((f));
-    for (x = 0; x < N; x++)
+    for (x = 0; x < M; x++)
     {
         z = 0;
         for (i = 0; i < n + 1; i++)
@@ -1826,7 +1993,112 @@ vec bms( short s[])
     return f;
 }
 
-ymo bm_itr( short s[])
+
+vec pmul(vec a, vec b)
+{
+    int i, j, k, l;
+    vec c = {0};
+
+    k = deg(a) + 1;
+    l = deg(b) + 1;
+    printf("k=%d,l=%d", k, l);
+    // exit(1);
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < l; j++)
+            if (a.x[i] > 0)
+            {
+                c.x[i + j] = (c.x[i + j] + a.x[i] * b.x[j]) % N;
+                // printf("%d=c ",c.x[i+j]);
+            }
+        // printf("\n");
+    }
+    /*
+    printf("\n");
+    printpol(v2o(c));
+    printf(" ==c\n");
+    printpol(v2o(a));
+    printf(" ==a\n");
+    printpol(v2o(b));
+    printf(" ==b\n");
+    // exit(1);
+    */
+    return c;
+}
+
+
+ymo bm_itr(unsigned short s[])
+{
+    vec U1[2][2] = {0}, U2[2][2][2] = {0}, null = {0};
+    int i, j, k;
+    ymo t = {0};
+
+    U2[0][0][0].x[0] = 1;       // f[0];
+    U2[0][0][1].x[0] = 0;       // fai[0];
+    U2[0][1][0].x[0] = 0;       // g[0];
+    U2[0][1][1].x[0] = N - (1); // thi[0];
+    int m = 0, d = 0, p = 2 * d - m - 1, myu = 0;
+    printf("m=%d d=%d myu=%d p=%d\n", m, d, myu, p);
+    for (m = 0; m < K; m++)
+    {
+        d = deg(U2[0][0][0]);
+        p = 2 * d - m - 1;
+        myu = 0;
+        for (int i = 0; i <= d; i++)
+            myu = (myu + U2[0][0][0].x[i] * s[i + (m - d)]) % N;
+
+        printf("m=%d ad=%d myu=%d p=%d\n", m, d, myu, p);
+        memset(U1, 0, sizeof(U1));
+        if (myu == 0 || p >= 0)
+        {
+            U1[0][0].x[0] = 1;
+            U1[0][1].x[p] = N - (myu);
+            U1[1][0].x[0] = 0;
+            U1[1][1].x[0] = 1;
+            // exit(1);
+        }
+        else if (myu > 0 && p < 0)
+        {
+            if (p < 0)
+            {
+                p = -1 * (p);
+            }
+            U1[0][0].x[p] = 1;
+            U1[0][1].x[0] = N - (myu);
+            U1[1][0].x[0] = inv(myu, N);
+            U1[1][1].x[0] = 0;
+        }
+        for (int i = 0; i < 2; i++)
+        {
+            for (int j = 0; j < 2; j++)
+            {
+                for (int k = 0; k < 2; k++)
+                    U2[1][i][j] = (vadd((U2[1][i][j]), (pmul(U1[i][k], U2[0][k][j]))));
+            }
+        }
+        memcpy(U2[0], U2[1], sizeof(U2[0]));
+        memset(U2[1], 0, sizeof(U2[1]));
+    }
+    t.f = U2[0][0][0];
+    t.g = U2[0][1][0];
+    t.h = U2[0][0][1];
+    if (deg(t.f) == T)
+    {
+        printsage((t.f));
+        printf(" ==chen00\n");
+        return t;
+    }
+    else
+    {
+        t.f = U2[1][0][0];
+        printsage((t.f));
+        printf("baka\n");
+        exit(1);
+    }
+}
+
+
+ymo bm_itr2( short s[])
 {
     vec U1[2][2] = {0}, U2[2][2][2] = {0}, null = {0};
     int i, j, k;
@@ -1943,7 +2215,6 @@ vec recv(MTX t, vec v)
     return x;
 }
 
-
 vec ev(vec x,vec v)
 {
     int i, j, k;
@@ -1989,6 +2260,7 @@ vec ev(vec x,vec v)
 
         return tx;
 }
+
 
 //モニック多項式にする
 vec coeff(vec f,  short d)
@@ -2439,6 +2711,51 @@ vec invpol2(vec a,vec I,int R)
   return g;
 }
 
+vec ev3(vec x,vec v)
+{
+    int i, j, k;
+    MTX mmk = {0};
+    MTX inv_A = {0};
+    vec tx = {0};
+
+    for (i = 0; i < K / 2; i++)
+    {
+        for (int j = 0; j < K / 2; j++)
+        {
+            mmk.x[j][i] = mat[x.x[i]][j];
+            printf("%d %df", mat[x.x[j]][i], x.x[j]);
+        }
+        printf("\n");
+    }
+    printf("\n(");
+    for (i = 0; i < K / 2; i++)
+        printf("%d ", x.x[i]);
+    printf(")\n");
+    // exit(1);
+    //mmk.x[0][K / 2] = 2;
+    //mmk.x[1][K / 2] = 5;
+    for (i = 0; i < K / 2; i++)
+    {
+        mmk.x[i][K / 2] = v.x[i];
+        for (int j = 0; j < K / 2; j++)
+            printf("%d^ ", mmk.x[i][j]);
+        printf("\n");
+    }
+
+    // tx.x[1]=v.x[1];
+    for (i = 0; i < K / 2; i++)
+        tx.x[i] = v.x[i];
+        //tx.x[1] = 5; //v.x[i];
+    // inv_A=ver(mmk);
+    inv_A = inverseMatrix(mmk, inv_A, 0, K / 2);
+    printf("inv %d %d %d\n", inv_A.x[0][0], inv_A.x[0][1], inv_A.x[0][2]);
+    printf("inv %d %d %d\n", inv_A.x[1][0], inv_A.x[1][1], inv_A.x[1][2]);
+    tx = recv(inv_A, tx);
+    for (i = 0; i < K / 2; i++)
+        printf("error value is %d\n", tx.x[i]);
+
+        return tx;
+}
 
 int main()
 {
@@ -2508,14 +2825,15 @@ int main()
         v.x[K-i-1]=x.x[i];
         ymo y=bm_itr(v.x);
         //for(i=0;i<T;i++)
-        //r.x[K-1-i]=y.f.x[i];
+        //v.x[K-1-i]=y.f.x[i];
         x=chen(y.f);
         //chen(r);
-         //exit(1);
-         for(i=0;i<N;i++)
+        // exit(1);
+         for(i=0;i<M;i++){
          if(z1[i]>0)
-         printf("i=%d\n",i);
-        //exit(1);
+         printf("i=%d %d\n",i,z1[i]);
+         }
+         //exit(1);
          // mkd(1);
         MTX b = {0};
 
@@ -2525,9 +2843,28 @@ int main()
         //printf(" ==synpol\n");
         printpol((v));
         printf(" ==synpol\n");
+        /*
+        for (i = 0; i < K / 2; i++)
+        {
+            for (int j = 0; j < K / 2 + 1; j++)
+            {
+                b.x[i][j] = v.x[i + j];
+                // printf("%d,",b.x[i][i+j]);
+            }
+            // printf("\n");
+        }
+        printf("\n");
+        for (i = 0; i < K / 2; i++)
+        {
+            for (int j = 0; j < K / 2 + 1; j++)
+                printf("e%d,", b.x[i][j]);
+            printf("\n");
+        }
+
         //exit(1);
 
-        //x = sol(b, 0, K / 2);
+        x = sol(b, 0, K / 2);
+        */
         /*
         for (i = 0; i < N; i++)
         {
