@@ -18,10 +18,10 @@
 #include "gcmb.c"
 
 #define SEPARABLE 0
-#define MATRIX_SIZE 16
+#define MATRIX_SIZE K
 #define SHM_KEY 128
 
- short g[K + 1] = {0};
+short g[K + 1] = {0};
 
 // ランダム多項式の生成
 static void
@@ -1703,7 +1703,7 @@ aa:
 
     w = mkpol();
     
-    l = ben_or((w));
+    //l = ben_or((w));
     while (l == -1)
         goto aa;
     printsage((w));
@@ -2806,7 +2806,7 @@ int main()
     // resl(v,x);
     // exit(1);
 
-    mkd(f, K);
+    mkd(f, K*2);
     //exit(1);
 
     while (1)
@@ -2843,7 +2843,7 @@ int main()
         //printf(" ==synpol\n");
         printpol((v));
         printf(" ==synpol\n");
-        /*
+        
         for (i = 0; i < K / 2; i++)
         {
             for (int j = 0; j < K / 2 + 1; j++)
@@ -2864,7 +2864,7 @@ int main()
         //exit(1);
 
         x = sol(b, 0, K / 2);
-        */
+        
         /*
         for (i = 0; i < N; i++)
         {

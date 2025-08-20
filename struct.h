@@ -107,39 +107,6 @@ typedef struct pub
   return (x << n) | (x >> (32 - n));
 }
 */
-/*
-typedef union
-{
-   long long int u[8];
-   char d[64];
-} arrayul;
-
-typedef struct a4
-{
-   char ar[4];
-} array;
-
-typedef struct a8
-{
-   char ar[8];
-} array8;
-
-typedef struct
-{
-   int h[16];
-} array16;
-
-typedef struct aN
-{
-   char ar[N];
-} arrayn;
-
-typedef struct pub
-{
-   char a[N];
-   char b[N];
-} set;
-*/
 
 typedef struct {
    short x[N][N];

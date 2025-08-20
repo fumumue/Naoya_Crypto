@@ -7,7 +7,7 @@
 
 
 #define MAX 2 // 素数表の先頭から何個素数を足すか
-#define NN 8  // 置換配列の次元
+#define NN 32  // 置換配列の次元
 
 int P[N] = {0};
 int inv_P[N]={0};
