@@ -229,6 +229,33 @@ void printpol(vec a)
     return;
 }
 
+// 多項式を表示する(default)
+void printpoln(vec a)
+{
+    int i, n,flg=0;
+
+    n = deg(a);
+
+    // printf ("baka\n");
+    //  assert(("baka\n", n >= 0));
+
+    for (i = n; i > -1; i--)
+    {
+        if (a.x[i] != 0)
+        {
+            printf("%d*", a.x[i]);
+            // if (i > 0)
+            printf("x^%d", i);
+            if(i>0)
+            printf("+");
+        }
+    }
+      printf("\n");
+
+    return;
+}
+
+
 
 vec cof( short R, vec f)
 {
@@ -386,13 +413,13 @@ void van(int kk)
     printf("\n");
 
     // #pragma omp parallel for private(i, j)
-    for (i = 1; i < kk; i++)
+    for (i = 1; i < kk+1; i++)
     {
-        for (j = 0; j < N; j++)
+        for (j = 1; j < N; j++)
         {
             vb[i][j] = mltn(i, j);
-            printf("g%d,", vb[i][j]);
-            mat[j][i] = vb[i][j];
+            printf("g%d,", vb[i-1][j-1]);
+            mat[j-1][i] = vb[i][j-1];
         }
         printf("\n");
     }
@@ -2757,11 +2784,55 @@ vec ev3(vec x,vec v)
         return tx;
 }
 
+
+typedef struct {
+    vec g;
+    vec h;
+} fair;
+
+fair soka(){
+    int i;
+    vec g[K]={0},h[N-K]={0},mod={0},gg={0},hh={0};
+    fair kubi={0};
+
+    gg.x[0]=1;
+    hh.x[0]=1;
+    for(i=1;i<N-K;i++){
+    g[i-1].x[0]=i;
+    g[i-1].x[1]=1;
+    }
+    for(i=N-K;i<N-1;i++){
+    h[i-N+K].x[0]=i;
+    h[i-N+K].x[1]=1;
+    }
+    for(i=0;i<K;i++)
+    gg=vmul(gg,g[i],N);
+    for(i=0;i<N-K-1;i++)
+    hh=vmul(hh,h[i],N);
+    mod.x[0]=N-1;
+    mod.x[N-1]=1;
+    printpoln(vmul(gg,hh,N));
+    printpoln(vmod(vmul(gg,hh,N),mod));
+    kubi.g=hh;
+    kubi.h=gg;
+    //exit(1);
+
+return kubi;
+}
+
+int ink(int vx){
+    for(int i=0;i<N;i++)
+    if(vx==mltn(i,2))
+    return N-i;
+}
+
 int main()
 {
     int i, u = 0;
-     short s[K + 1] = {0}, z1[N] = {0};
-    
+    short s[K + 1] = {0}, z1[N] = {0};
+    fair ff20={0};
+    unsigned gol=0b101011100011;
+
     srand(clock());
 
     vec v = {2,4,0,1}, x={30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
@@ -2770,11 +2841,73 @@ int main()
     vec g = {1,0,30,30,0,1,1,0,30,1,30,1,0,30};
     vec h={0},ff={1,2,3}; //{40,0,1,1,40,0,1},gg={37,2,40,21,31,26,8};
     vec t = {4,29,16,6,11,21,18,30,16,28,24,12,15,9,20,21};
-    vec vv = {0},m={1,0,1,0,1,0,1,0,1,0,0,0,1,0,1},I={0},II={1,0,1,-1,-1,1,-1,0,1,1,-1,-1,0,1,0,0,0},I2={Q-1,1,1,0,Q-1,0,1,0,0,1,Q-1,0,0,0,0,0,0},I3={31,1,1,0,31,0,1,0,0,1,31,0,0,0,0,0,0},J={0,0,0,0,2};
+    vec vv = {0},m0={1,0,1,0,1,0,1,0,1,0,0,0,1,0,1},I={0},II={1,0,1,-1,-1,1,-1,0,1,1,-1,-1,0,1,0,0,0},I2={Q-1,1,1,0,Q-1,0,1,0,0,1,Q-1,0,0,0,0,0,0},I3={31,1,1,0,31,0,1,0,0,1,31,0,0,0,0,0,0},J={0,0,0,0,2};
     vec xx={5,9,6,16,4,15,16,22,20,18,30};
+    vec us={0},mm={0},cc={0};
+    vec gg[K+1]={0},g0={0};
 
-    printf("%b\n",N);
+    for(i=0;i<K;i++){
+    gg[i].x[0]=N-(i+1);
+    gg[i].x[1]=1;
+    printf("%d\n",trace(gg[i],i+1));
+    }
+    for(i=0;i<4;i++)
+    printf("%d,",trace(gg[0],i));
+    printf("\n");
     //exit(1);
+    
+    g0.x[0]=1;
+    for(i=0;i<K;i++)
+    g0=vmul(g0,gg[i],N);
+    printpoln(g0);
+    for(i=1;i<K+1;i++)
+    printf("%d,",trace(g0,i));
+    printf("\n");
+    //exit(1);
+
+    ff20=soka();
+
+    //exit(1);
+
+    for(i=0;i<K/2;i++)
+    mm.x[i]=17;
+    mm.x[K/2]=1;
+
+    //vec w=mkpol(K);
+    vec c=vmul(mm,g0,N);
+    vec b={0}; //vmod(c,ff20.h);
+    for(i=0;i<M;i++)
+    b.x[i]=m(gol,c.x[i]);
+    printpoln(b);
+    //exit(1);
+
+    //vec d=vadd(c,b);
+    //printpoln(vmod(vmul(ff20.g,ff20.h,N),us));
+    //exit(1);
+    printpol(c);
+    //char zzz[6]={3,7,13,4,14,9};
+    //char xxx[6]={14,4,13,7,3,1};
+    vec ee={0};
+    /*
+    //for(i=0;i<6;i++)
+    //ee.x[5-i]=zzz[i];
+    printf("\n");
+    //ymo y=bm_itr(vx.x);
+    printf("\n");
+    //printpoln(y.f);
+    //exit(1);
+    //chen(y.f);
+    printf("\n");
+    //exit(1);
+    for(i=0;i<K;i++)
+    x.x[K-i-1]=vx.x[i];
+    //ymo y=bm_itr(vx.x);
+    printf("\n");
+    chen(vx);
+    printpoln(err);
+    ev(vx,y.f);
+    exit(1);
+    */
     fugo();
     //exit(1);
     I.x[0]=Q-1;
@@ -2802,11 +2935,80 @@ int main()
     //v=invpol((I3),32);
     //v=vinv2(I2,I,P);
 
-
+    //f=mkpol(K);
     // resl(v,x);
     // exit(1);
+    //f=cc;
+    van(K);
+    //mkd(g0, K);
 
-    mkd(f, K*2);
+    vec err={0},sin={0};
+    //for(i=0;i<T;i++)
+    //err.x[i]=1;
+    err.x[2]=1;
+    err.x[3]=1;
+    
+    for(i=1;i<5;i++)
+    {
+        int l=mltn(i,2);
+    printf("l=%d %d\n",trace(err,l),l);
+        sin.x[K-i]=trace(err,l);
+        }
+        printf("\n");
+        printpoln(sin);
+    //printf("syn~%d\n",trace(err,l%N));
+    //}
+    //exit(1);
+    printpoln(g0);
+    for(i=0;i<K;i++){
+        int l=0;
+    for(int j=0;j<N-1;j++){
+        if(err.x[j]>0){
+        //printf("e=%d %d\n",err.x[j],j);
+        l+=mat[j][i]*err.x[j];
+        }
+    }
+    printf("l=%d",l%N);
+    sin.x[i]=l%N;
+    printf("\n");
+    //printf("l=%d,",l%N);
+    //printf("\n");
+    }
+    //exit(1);
+    int j=0;
+    for(i=1;i<K+1;i++){
+    j=1;
+        for(int k=0;k<i+1;k++)
+            j*=j*(i+1);
+    printf("%d,",trace(err,i));
+    }
+    printf("\n");
+    //printpoln(cc);
+    //exit(1);
+    printpoln(ff20.g);
+    printpoln(ff20.h);
+    printpoln(b);
+    //printpoln(d);
+    for(i=N-K;i<N;i++)
+    printf("h%d,",trace(ff20.h,i));
+    printf("\n");
+    //exit(1);
+    vec d=vadd(c,err);
+    printpoln(d);
+    //exit(1);
+    vec vx={0};
+    for(i=1;i<K+1;i++)
+    printf("%d,",trace(err,i-1));
+    printf("\n");
+    //for(i=1;i<K+1;i++)
+    //printf("%d,",trace(d,i));
+    //printf("\n");
+    //exit(1);
+    for(i=16;i>N-K;i--){
+        vx.x[i]=trace(err,i*i%N);
+    //printf("v%d,",vx.x[i]);
+    }
+    printf("\n");
     //exit(1);
 
     while (1)
@@ -2817,18 +3019,30 @@ int main()
         // mkerr(z1, T);    // generate error vector
         for (int i = 0; i < T; i++)
             z1[i] = i+1;
-
-        x = synd(z1, K); // calc syndrome
-        vec r={0};
+        vec dd={0};
+        //exit(1);
+        x = synd(err.x, K); // calc syndrome
+        printpoln(x);
+        for(i=0;i<K;i++)
+            dd.x[K-i-1]=x.x[i];//trace(vadd(err,c),K-i);
+        //d=synd(err.x,K);
+        printpol(dd);
+        printf(" un0\n");
+        //printpoln(vx);
+        //exit(1);
+        
+        vec r={2,4,2,1};
         //vec r = bms(x.x);    // Berlekamp-Massey Algorithm
         for(i=0;i<K;i++)
         v.x[K-i-1]=x.x[i];
-        ymo y=bm_itr(v.x);
+        printpoln(v);
+        //exit(1);
+        ymo y=bm_itr(sin.x);
         //for(i=0;i<T;i++)
         //v.x[K-1-i]=y.f.x[i];
         x=chen(y.f);
         //chen(r);
-        // exit(1);
+        exit(1);
          for(i=0;i<M;i++){
          if(z1[i]>0)
          printf("i=%d %d\n",i,z1[i]);
@@ -2843,7 +3057,7 @@ int main()
         //printf(" ==synpol\n");
         printpol((v));
         printf(" ==synpol\n");
-        
+        /*
         for (i = 0; i < K / 2; i++)
         {
             for (int j = 0; j < K / 2 + 1; j++)
@@ -2864,7 +3078,7 @@ int main()
         //exit(1);
 
         x = sol(b, 0, K / 2);
-        
+        */
         /*
         for (i = 0; i < N; i++)
         {
@@ -2881,9 +3095,9 @@ int main()
         int flg = 0,yo=0;
         for (i = 0; i < N; i++)
         {
-            if (z1[i] > 0)
+            if (err.x[i] > 0)
             {
-                printf("(correcting ,original) = (%d, %d) %d\n", x.x[yo], z1[i], i);
+                printf("(correcting ,original) = (%d, %d) %d\n", x.x[yo], err.x[i], i);
                 yo++;
                 flg++;
             }
@@ -2896,3 +3110,4 @@ int main()
     }
     return 0;
 }
+
