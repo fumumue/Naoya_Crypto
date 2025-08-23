@@ -2826,6 +2826,23 @@ int ink(int vx){
     return N-i;
 }
 
+vec msm(vec err){
+int i,l;
+vec sin={0};
+
+for(i=1;i<K+1;i++)
+    {
+        int l=mltn(i,2);
+    printf("l=%d %d\n",trace(err,l),l);
+        sin.x[K-i]=trace(err,l);
+        }
+        printf("\n");
+        printpoln(sin);
+
+        return sin;
+}
+
+
 int main()
 {
     int i, u = 0;
@@ -2881,64 +2898,6 @@ int main()
     printpoln(b);
     //exit(1);
 
-    //vec d=vadd(c,b);
-    //printpoln(vmod(vmul(ff20.g,ff20.h,N),us));
-    //exit(1);
-    printpol(c);
-    //char zzz[6]={3,7,13,4,14,9};
-    //char xxx[6]={14,4,13,7,3,1};
-    vec ee={0};
-    /*
-    //for(i=0;i<6;i++)
-    //ee.x[5-i]=zzz[i];
-    printf("\n");
-    //ymo y=bm_itr(vx.x);
-    printf("\n");
-    //printpoln(y.f);
-    //exit(1);
-    //chen(y.f);
-    printf("\n");
-    //exit(1);
-    for(i=0;i<K;i++)
-    x.x[K-i-1]=vx.x[i];
-    //ymo y=bm_itr(vx.x);
-    printf("\n");
-    chen(vx);
-    printpoln(err);
-    ev(vx,y.f);
-    exit(1);
-    */
-    fugo();
-    //exit(1);
-    I.x[0]=Q-1;
-    I.x[K*2]=1;
-    I2=mkpol(K);
-    printf(" wooooow%d\n",30*31%32);
-    printpol(vmod2(vmul(xx,trim(I2,32),32),I,32));
-    printf(" E2\n");
-    // if N is Prime
-    printpol(vmod(vmul(vinv(I2,I),I2,N),I));
-    printf("\n");
-    // if N is not Prime
-    //printpol(deli(vmul(invpol(I2),I2,N),I));
-    printf("\n");
-    //exit(1);
-    h.x[7]=1;
-
-    //xx=mkpol3(10,32);
-    //v=vmod2(I,trim(I3,31),31);
-    //v=vinv2(I2,I,3);
-    //exit(1);
-    //v=(invpol2(I2,I,P));
-    //printpol(v);
-    //printf(" ==I3\n");
-    //v=invpol((I3),32);
-    //v=vinv2(I2,I,P);
-
-    //f=mkpol(K);
-    // resl(v,x);
-    // exit(1);
-    //f=cc;
     van(K);
     //mkd(g0, K);
 
@@ -2948,14 +2907,8 @@ int main()
     err.x[2]=1;
     err.x[3]=1;
     
-    for(i=1;i<5;i++)
-    {
-        int l=mltn(i,2);
-    printf("l=%d %d\n",trace(err,l),l);
-        sin.x[K-i]=trace(err,l);
-        }
-        printf("\n");
-        printpoln(sin);
+    sin=msm(err);
+    
     //printf("syn~%d\n",trace(err,l%N));
     //}
     //exit(1);
