@@ -407,8 +407,8 @@ void van(int kk)
 
     for (i = 0; i < N; i++)
     {
-        mat[i][0] = vb[0][i] = 1;
-        printf("%d,", vb[0][i]);
+        //mat[i][0] = vb[0][i] = 1;
+        //printf("%d,", vb[0][i]);
     }
     printf("\n");
 
@@ -417,9 +417,9 @@ void van(int kk)
     {
         for (j = 1; j < N; j++)
         {
-            vb[i][j] = mltn(i, j);
+            vb[i-1][j-1] = mltn(i, j);
             printf("g%d,", vb[i-1][j-1]);
-            mat[j-1][i] = vb[i][j-1];
+            mat[j-1][i-1] = vb[i-1][j-1];
         }
         printf("\n");
     }
@@ -1969,7 +1969,7 @@ vec chen(vec f)
         {
             e.x[count] = x;
             count++;
-            printf("change %d\n", (x));
+            printf("change %d\n", ink(x));
         }
     }
 
@@ -2822,23 +2822,36 @@ return kubi;
 
 int ink(int vx){
     for(int i=0;i<N;i++)
-    if(vx==mltn(i,2))
-    return N-i;
+    if(vx==mltn(i,3))
+    return i;
 }
 
 vec msm(vec err){
 int i,l;
+vec syn[K]={0};
 vec sin={0};
 
-for(i=1;i<K+1;i++)
-    {
-        int l=mltn(i,2);
-    printf("l=%d %d\n",trace(err,l),l);
-        sin.x[K-i]=trace(err,l);
+printpoln(err);
+for(int j=1;j<M;j++)
+{
+l=0;
+    for(i=1;i<K+1;i++)
+    {   
+        if(err.x[j]>0)
+        {
+        l=mltn(i,j);
+            sin.x[i-1]+=l;
+            sin.x[i-1]%=N;
+        //sin.x[i-1]=trace(err,l);
         }
-        printf("\n");
+    }
+    printf("l=%d %d %d\n",sin.x[j-1],j,l%N);
+    }
+        printf("Uh!\n");
         printpoln(sin);
-
+        ymo y=bm_itr(sin.x);
+        chen(y.f);
+        
         return sin;
 }
 
@@ -2862,9 +2875,10 @@ int main()
     vec xx={5,9,6,16,4,15,16,22,20,18,30};
     vec us={0},mm={0},cc={0};
     vec gg[K+1]={0},g0={0};
-
-    for(i=0;i<K;i++){
-    gg[i].x[0]=N-(i+1);
+    int nn=3;
+    int jj=1;
+    for(i=0;i<K+1;i++){
+    gg[i].x[0]=N-mltn(i+1,3);
     gg[i].x[1]=1;
     printf("%d\n",trace(gg[i],i+1));
     }
@@ -2886,9 +2900,9 @@ int main()
 
     //exit(1);
 
-    for(i=0;i<K/2;i++)
+    for(i=0;i<K/2-1;i++)
     mm.x[i]=17;
-    mm.x[K/2]=1;
+    mm.x[K/2-1]=1;
 
     //vec w=mkpol(K);
     vec c=vmul(mm,g0,N);
@@ -2901,54 +2915,51 @@ int main()
     van(K);
     //mkd(g0, K);
 
-    vec err={0},sin={0};
+    vec err={0},sin={3,2};
     //for(i=0;i<T;i++)
     //err.x[i]=1;
+    err.x[4]=1;
     err.x[2]=1;
-    err.x[3]=1;
+    err.x[5]=1;
+    err.x[6]=1;
     
-    sin=msm(err);
-    
-    //printf("syn~%d\n",trace(err,l%N));
-    //}
     //exit(1);
-    printpoln(g0);
-    for(i=0;i<K;i++){
-        int l=0;
-    for(int j=0;j<N-1;j++){
-        if(err.x[j]>0){
-        //printf("e=%d %d\n",err.x[j],j);
-        l+=mat[j][i]*err.x[j];
-        }
-    }
-    printf("l=%d",l%N);
-    sin.x[i]=l%N;
-    printf("\n");
-    //printf("l=%d,",l%N);
-    //printf("\n");
-    }
-    //exit(1);
-    int j=0;
+    vec d=vadd(err,c);
+    int j=1,n=3;
     for(i=1;i<K+1;i++){
-    j=1;
-        for(int k=0;k<i+1;k++)
-            j*=j*(i+1);
-    printf("%d,",trace(err,i));
+        printf("n=%d\n",n);
+    printf("%d,",trace(d,n));
+    printf("\n");
+    n*=3;
+    n%=N;
+    }
+    //exit(1);
+
+    for(i=1;i<K+1;i++){
+    printf("a%d,",trace(d,mltn(i,3)));
+    sin.x[i-1]=trace(d,mltn(i,3));
     }
     printf("\n");
-    //printpoln(cc);
-    //exit(1);
-    printpoln(ff20.g);
-    printpoln(ff20.h);
-    printpoln(b);
-    //printpoln(d);
-    for(i=N-K;i<N;i++)
-    printf("h%d,",trace(ff20.h,i));
-    printf("\n");
-    //exit(1);
-    vec d=vadd(c,err);
-    printpoln(d);
-    //exit(1);
+    printpoln(err);
+    ymo yy=bm_itr(sin.x);
+    chen(yy.f);
+    exit(1);
+
+    for(i=1;i<K+1;i++)
+    printf("%d,",trace(d,i));
+    printf("arr\n");
+printf("\n");
+    exit(1);
+    sin=msm(c);
+    //sin=msm(d);
+    //sin=msm(err);
+    exit(1);
+
+    printpoln(c);
+    ymo pp=bm_itr(sin.x);
+    chen(pp.f);
+    exit(1);
+
     vec vx={0};
     for(i=1;i<K+1;i++)
     printf("%d,",trace(err,i-1));
@@ -2963,6 +2974,7 @@ int main()
     }
     printf("\n");
     //exit(1);
+    //sin=msm(d);
 
     while (1)
     {
