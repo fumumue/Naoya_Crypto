@@ -6,10 +6,10 @@
 //Nは符号の長さ、Kが符号の次元、Tは訂正エラー数
 //を表す。ここではDは符号長にしている。
 #define N 257 // set small prime ex. p=2053
-#define M N // puncture code
-#define K (8) // degree of polynomial
-#define E (9)   // bit size of prime
-#define DEG N // set (K * E) < N
+#define M N// puncture code
+#define K (120) // degree of polynomial
+#define E (8)   // bit size of prime
+#define DEG N*2 // set (K * E) < N
 #define T (K / 2) // weight of error vector
 #define Q K*2
 

@@ -415,11 +415,11 @@ void van(int kk)
     // #pragma omp parallel for private(i, j)
     for (i = 1; i < kk+1; i++)
     {
-        for (j = 1; j < N; j++)
+        for (j = 0; j < N-1; j++)
         {
-            vb[i-1][j-1] = mltn(i, j);
-            printf("g%d,", vb[i-1][j-1]);
-            mat[j-1][i-1] = vb[i-1][j-1];
+            vb[i-1][j] = mltn(i, j);
+            printf("g%d,", vb[i-1][j]);
+            mat[j][i-1] = vb[i-1][j];
         }
         printf("\n");
     }
@@ -885,6 +885,10 @@ vec vmul(vec a, vec b,int R)
     k = deg(a);
     l = deg(b);
 
+    if(l+k>N){
+        printf("blake %d\n",l+k);
+        exit(1);
+    }
     i = 0;
     while (i < k + 1)
     {
@@ -1907,11 +1911,11 @@ void mkerr( short *z1, int num)
 
     while (j < num)
     {
-        l = rand() % (M - 1);
+        l = rand() % (N - 2)+1;
         // printf ("l=%d\n", l);
         if (0 == z1[l] && l > 0)
         {
-            z1[l] = 2; //rand()%N;
+            z1[l] = 1; //rand()%N;
             // printf("l=%d\n", l);
             if(z1[l]>0)
             j++;
@@ -1967,12 +1971,16 @@ vec chen(vec f)
         }
         if (z % N == 0)
         {
-            e.x[count] = x;
+            e.x[count] = ink(x);
             count++;
             printf("change %d\n", ink(x));
         }
     }
-
+    if(count<T)
+    {
+        printf("kaba\n");
+        exit(1);
+    }
     return e;
 }
 
@@ -2088,7 +2096,7 @@ ymo bm_itr(unsigned short s[])
         {
             if (p < 0)
             {
-                p = -1 * (p);
+                p = (-1 * (p));
             }
             U1[0][0].x[p] = 1;
             U1[0][1].x[0] = N - (myu);
@@ -2099,8 +2107,13 @@ ymo bm_itr(unsigned short s[])
         {
             for (int j = 0; j < 2; j++)
             {
-                for (int k = 0; k < 2; k++)
-                    U2[1][i][j] = (vadd((U2[1][i][j]), (pmul(U1[i][k], U2[0][k][j]))));
+                printpoln(U1[i][k]);
+                for (int k = 0; k < 2; k++){
+                    printf("ii! %d %d %d %d\n",i,k, deg(U1[i][k]), deg(U2[0][k][j]));
+                    if(deg(U1[0][0])>N)
+                    U1[0][0].x[513]=0;
+                    U2[1][i][j] = (vadd((U2[1][i][j]), (vmul(U1[i][k], U2[0][k][j],N))));
+                }
             }
         }
         memcpy(U2[0], U2[1], sizeof(U2[0]));
@@ -2821,9 +2834,14 @@ return kubi;
 }
 
 int ink(int vx){
-    for(int i=0;i<N;i++)
-    if(vx==mltn(i,3))
-    return i;
+
+    for(int i=0;i<N-1;i++){
+    if((vx)==mltn(i,3)){
+        return i;
+        }
+    }
+    exit(1);
+    //return N-1;
 }
 
 vec msm(vec err){
@@ -2856,6 +2874,221 @@ l=0;
 }
 
 
+vec keygen(){
+    int i;
+    vec g0={0},gg[K+1]={0};
+
+    for(i=0;i<K+1;i++){
+    gg[i].x[0]=N-mltn(i+1,3);
+    gg[i].x[1]=1;
+    printf("%d\n",trace(gg[i],i+1));
+    }
+    for(i=0;i<4;i++)
+    printf("%d,",trace(gg[0],i));
+    printf("\n");
+    //exit(1);
+    
+    g0.x[0]=1;
+    for(i=0;i<K;i++)
+    g0=vmul(g0,gg[i],N);
+    printpoln(g0);
+    for(i=1;i<K+1;i++)
+    printf("%d,",trace(g0,i));
+    printf("\n");
+    //exit(1);
+
+    return g0;
+}
+
+
+typedef union {
+    unsigned long long int x[30];
+    unsigned d[60];
+    unsigned short c[120*8];
+} uni;
+
+/**
+ * struct state - represents the 320-bit state of ascon
+ *
+ * @x: array containing the five 64-bit registers of the state
+ */
+struct state {
+	uint64_t x[5];
+};
+
+static inline unsigned rotr(uint32_t x, uint8_t n)
+{
+	return x >> n | x << (32 - n);
+}
+
+//整数からベクトル型への変換
+vec i2v(unsigned int n)
+{
+    vec v = {0};
+    int i = 0;
+
+    while (n > 0)
+    {
+        v.x[i++] = n % 2;
+        n = (n >> 1);
+    }
+
+    return v;
+}
+
+//ベクトル型から整数への変換
+unsigned v2i(vec v)
+{
+    unsigned long long int d = 0, i, e = 0;
+
+    for (i = 0; i < 32; i++)
+    {
+        e = v.x[i];
+        d ^= (e << i);
+    }
+
+    return d;
+}
+
+/**
+ * ascon_permutate - performs the permutation
+ *
+ * @s: the state
+ * @nr: the number of rounds
+ *
+ * Performs the main permutation for ascon algorithms using the given
+ * number of rounds.
+ */
+static void ascon_permutate(struct state *s, uint8_t nr)
+{
+	uint64_t t[5];
+
+	for (uint8_t i = 12 - nr; i < 12; ++i) {
+		// constant addition layer
+		s->x[2] ^= (((uint64_t) (0xf) - i) << 4) | i;
+
+		// substitution layer (SBox)
+		s->x[0] ^= s->x[4];
+		s->x[4] ^= s->x[3];
+		s->x[2] ^= s->x[1];
+		t[0] = s->x[0];
+		t[1] = s->x[1];
+		t[2] = s->x[2];
+		t[3] = s->x[3];
+		t[4] = s->x[4];
+		t[0] = ~t[0];
+		t[1] = ~t[1];
+		t[2] = ~t[2];
+		t[3] = ~t[3];
+		t[4] = ~t[4];
+		t[0] &= s->x[1];
+		t[1] &= s->x[2];
+		t[2] &= s->x[3];
+		t[3] &= s->x[4];
+		t[4] &= s->x[0];
+		s->x[0] ^= t[1];
+		s->x[1] ^= t[2];
+		s->x[2] ^= t[3];
+		s->x[3] ^= t[4];
+		s->x[4] ^= t[0];
+		s->x[1] ^= s->x[0];
+		s->x[0] ^= s->x[4];
+		s->x[3] ^= s->x[2];
+		s->x[2] = ~s->x[2];
+
+		// linear diffusion layer
+		s->x[0] ^= rotr(s->x[0], 19) ^ rotr(s->x[0], 28);
+		s->x[1] ^= rotr(s->x[1], 61) ^ rotr(s->x[1], 39);
+		s->x[2] ^= rotr(s->x[2], 1) ^ rotr(s->x[2], 6);
+		s->x[3] ^= rotr(s->x[3], 10) ^ rotr(s->x[3], 17);
+		s->x[4] ^= rotr(s->x[4], 7) ^ rotr(s->x[4], 41);
+	}
+}
+
+
+vec coda(uni on){
+ int i;
+vec a[8]={0},inv_a[8]={0};
+vec aa[30]={0},o[30]={0};
+
+for(i=0;i<120;i++)
+    a[0].x[i]=i;
+    for(i=0;i<32;i++)
+    a[1].x[i]=i;
+
+    random_shuffle(a[0].x,120);
+    random_shuffle(a[1].x,32);
+    for(i=0;i<120;i++){
+        printf("%d,",a[0].x[i]);
+    inv_a[0].x[a[0].x[i]]=i;
+    }
+    printf("\n");
+    //exit(1);
+
+    
+    for(i=0;i<32;i++)
+    inv_a[1].x[a[1].x[i]]=i;
+
+    uni und={0};
+    for(i=0;i<120;i++)
+        und.c[i]=on.c[a[0].x[i]];
+    for(i=0;i<120;i++)
+    printf("%d,",und.c[i]);
+    printf("\n");
+    //exit(1);
+
+    for(i=0;i<30;i++)
+        aa[i]=i2v(rotr(und.d[i],17));
+    for(int j=0;j<30;j++){
+    for(i=0;i<32;i++){
+        o[j].x[i]=aa[j].x[a[1].x[i]];
+        printf("%d,",o[j].x[i]);
+    }
+    printf("\n");
+    }
+    printf("\n");
+    
+    uni bb={0};
+    vec p[30]={0};
+    for(i=0;i<30;i++){
+       bb.d[i]= v2i(aa[i]);
+    }
+    for(i=0;i<120;i++)
+    printf("%d,",bb.c[i]);
+    printf("\n");
+    
+    uni q[30]={0};
+    for(int j=0;j<30;j++){
+        for(i=0;i<32;i++)
+        p[j].x[i]=o[j].x[inv_a[1].x[i]];
+    }
+    for(i=0;i<30;i++)
+    bb.d[i]=rotr(v2i(p[i]),15);
+    for(i=0;i<120;i++)
+    und.c[i]=bb.c[inv_a[0].x[i]];
+    for(i=0;i<120;i++)
+    printf("%d,",und.c[i]);
+    printf("\n");
+}
+
+int wt(vec e){
+    int i,count=0;
+
+    for(i=0;i<N;i++)
+    if(e.x[i]>0)
+    count++;
+
+    return count;
+}
+int vor(vec v){
+    for(int i=0;i<N;i++){
+    if(v.x[256]>0){
+        printf("baka\n");
+        exit(1);
+    }
+    }
+}
+
 int main()
 {
     int i, u = 0;
@@ -2877,34 +3110,27 @@ int main()
     vec gg[K+1]={0},g0={0};
     int nn=3;
     int jj=1;
-    for(i=0;i<K+1;i++){
-    gg[i].x[0]=N-mltn(i+1,3);
-    gg[i].x[1]=1;
-    printf("%d\n",trace(gg[i],i+1));
-    }
-    for(i=0;i<4;i++)
-    printf("%d,",trace(gg[0],i));
-    printf("\n");
-    //exit(1);
-    
-    g0.x[0]=1;
-    for(i=0;i<K;i++)
-    g0=vmul(g0,gg[i],N);
-    printpoln(g0);
-    for(i=1;i<K+1;i++)
-    printf("%d,",trace(g0,i));
-    printf("\n");
+    uni on={0},ola={0};
+   long long plaintext[] = {0x1234567890abcdef, 0x1234567890abcdef};
+   long long ciphertext[2] = { 0 };
+
+
+    for(i=0;i<N-1;i++)
+    printf("%d=%d\n",i,ink(mltn(i,3)));
     //exit(1);
 
-    ff20=soka();
+    for(i=0;i<120;i++)
+        on.c[i]=i+1;
+    coda(on);  
+    //exit(1);
 
+    g0=keygen();
     //exit(1);
 
     for(i=0;i<K/2-1;i++)
     mm.x[i]=17;
-    mm.x[K/2-1]=1;
+    mm.x[K/2]=1;
 
-    //vec w=mkpol(K);
     vec c=vmul(mm,g0,N);
     vec b={0}; //vmod(c,ff20.h);
     for(i=0;i<M;i++)
@@ -2912,17 +3138,14 @@ int main()
     printpoln(b);
     //exit(1);
 
-    van(K);
+    //van(K);
     //mkd(g0, K);
 
-    vec err={0},sin={3,2};
-    //for(i=0;i<T;i++)
+    vec err={0},sin={0};
+    //for(i=0;i<T-1;i++)
     //err.x[i]=1;
-    err.x[4]=1;
-    err.x[2]=1;
-    err.x[5]=1;
-    err.x[6]=1;
-    
+    //err.x[N-2]=1;
+    mkerr(err.x,T);
     //exit(1);
     vec d=vadd(err,c);
     int j=1,n=3;
@@ -2930,49 +3153,57 @@ int main()
         printf("n=%d\n",n);
     printf("%d,",trace(d,n));
     printf("\n");
+    printf("a%d,",trace(d,mltn(i,3)));
+    sin.x[i-1]=trace(d,mltn(i,3));
     n*=3;
     n%=N;
     }
     //exit(1);
 
-    for(i=1;i<K+1;i++){
-    printf("a%d,",trace(d,mltn(i,3)));
-    sin.x[i-1]=trace(d,mltn(i,3));
-    }
     printf("\n");
     printpoln(err);
-    ymo yy=bm_itr(sin.x);
-    chen(yy.f);
-    exit(1);
-
-    for(i=1;i<K+1;i++)
-    printf("%d,",trace(d,i));
-    printf("arr\n");
-printf("\n");
-    exit(1);
-    sin=msm(c);
-    //sin=msm(d);
-    //sin=msm(err);
-    exit(1);
-
-    printpoln(c);
-    ymo pp=bm_itr(sin.x);
-    chen(pp.f);
-    exit(1);
-
-    vec vx={0};
-    for(i=1;i<K+1;i++)
-    printf("%d,",trace(err,i-1));
-    printf("\n");
-    //for(i=1;i<K+1;i++)
-    //printf("%d,",trace(d,i));
-    //printf("\n");
+    vec sk2={0};
     //exit(1);
-    for(i=16;i>N-K;i--){
-        vx.x[i]=trace(err,i*i%N);
-    //printf("v%d,",vx.x[i]);
+    vec e2={0},ea={0};
+    printf("%d %d\n",wt(ea),wt(err));
+    vor(ea);
+
+    ymo yy=bm_itr(sin.x);
+    x=chen(yy.f);
+    //exit(1);
+    /*
+    for(i=0;i<N;i++){
+        if(x.x[i]==0)
+        x.x[i]=256;
+        //ea.x[x.x[i]]=1;
     }
-    printf("\n");
+    */
+    for(i=0;i<N;i++){
+        if(x.x[i]>0)
+        ea.x[x.x[i]]=1;
+    }
+    //printpoln(ea);
+    //printpoln(err);
+    //exit(1);
+
+    e2=vsub(d,(ea));
+    for(i=0;i<N;i++){
+        if(err.x[i]!=ea.x[i]){
+            printf("%d %d %d\n",i,err.x[i],ea.x[i]);
+            exit(1);
+        }
+    }
+    //exit(1);
+    for(i=0;i<N;i++)
+    printf("%d,",x.x[i]);
+    
+    printpoln(d);
+    d=vdiv(e2,g0);
+    printpoln(d);
+    exit(1);
+    
+    //for(i=0;i<T;i++)
+
     //exit(1);
     //sin=msm(d);
 
@@ -2996,7 +3227,7 @@ printf("\n");
         //printpoln(vx);
         //exit(1);
         
-        vec r={2,4,2,1};
+        //vec r={2,4,2,1};
         //vec r = bms(x.x);    // Berlekamp-Massey Algorithm
         for(i=0;i<K;i++)
         v.x[K-i-1]=x.x[i];
@@ -3007,7 +3238,7 @@ printf("\n");
         //v.x[K-1-i]=y.f.x[i];
         x=chen(y.f);
         //chen(r);
-        exit(1);
+        //exit(1);
          for(i=0;i<M;i++){
          if(z1[i]>0)
          printf("i=%d %d\n",i,z1[i]);
