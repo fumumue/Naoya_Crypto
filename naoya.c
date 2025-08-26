@@ -887,7 +887,7 @@ vec vmul(vec a, vec b,int R)
 
     if(l+k>N){
         printf("blake %d\n",l+k);
-        exit(1);
+        //exit(1);
     }
     i = 0;
     while (i < k + 1)
@@ -2110,8 +2110,10 @@ ymo bm_itr(unsigned short s[])
                 printpoln(U1[i][k]);
                 for (int k = 0; k < 2; k++){
                     printf("ii! %d %d %d %d\n",i,k, deg(U1[i][k]), deg(U2[0][k][j]));
-                    if(deg(U1[0][0])>N)
-                    U1[0][0].x[513]=0;
+                    if(deg(U1[0][0])>N-K){
+                    for(int ii=N-K;ii<N*2;ii++)
+                        U1[0][0].x[ii]=0;
+                    }
                     U2[1][i][j] = (vadd((U2[1][i][j]), (vmul(U1[i][k], U2[0][k][j],N))));
                 }
             }
@@ -2902,9 +2904,9 @@ vec keygen(){
 
 
 typedef union {
-    unsigned long long int x[30];
-    unsigned d[60];
-    unsigned short c[120*8];
+    unsigned long long int x[15];
+    unsigned d[30];
+    unsigned short c[120];
 } uni;
 
 /**
@@ -3006,70 +3008,6 @@ static void ascon_permutate(struct state *s, uint8_t nr)
 }
 
 
-vec coda(uni on){
- int i;
-vec a[8]={0},inv_a[8]={0};
-vec aa[30]={0},o[30]={0};
-
-for(i=0;i<120;i++)
-    a[0].x[i]=i;
-    for(i=0;i<32;i++)
-    a[1].x[i]=i;
-
-    random_shuffle(a[0].x,120);
-    random_shuffle(a[1].x,32);
-    for(i=0;i<120;i++){
-        printf("%d,",a[0].x[i]);
-    inv_a[0].x[a[0].x[i]]=i;
-    }
-    printf("\n");
-    //exit(1);
-
-    
-    for(i=0;i<32;i++)
-    inv_a[1].x[a[1].x[i]]=i;
-
-    uni und={0};
-    for(i=0;i<120;i++)
-        und.c[i]=on.c[a[0].x[i]];
-    for(i=0;i<120;i++)
-    printf("%d,",und.c[i]);
-    printf("\n");
-    //exit(1);
-
-    for(i=0;i<30;i++)
-        aa[i]=i2v(rotr(und.d[i],17));
-    for(int j=0;j<30;j++){
-    for(i=0;i<32;i++){
-        o[j].x[i]=aa[j].x[a[1].x[i]];
-        printf("%d,",o[j].x[i]);
-    }
-    printf("\n");
-    }
-    printf("\n");
-    
-    uni bb={0};
-    vec p[30]={0};
-    for(i=0;i<30;i++){
-       bb.d[i]= v2i(aa[i]);
-    }
-    for(i=0;i<120;i++)
-    printf("%d,",bb.c[i]);
-    printf("\n");
-    
-    uni q[30]={0};
-    for(int j=0;j<30;j++){
-        for(i=0;i<32;i++)
-        p[j].x[i]=o[j].x[inv_a[1].x[i]];
-    }
-    for(i=0;i<30;i++)
-    bb.d[i]=rotr(v2i(p[i]),15);
-    for(i=0;i<120;i++)
-    und.c[i]=bb.c[inv_a[0].x[i]];
-    for(i=0;i<120;i++)
-    printf("%d,",und.c[i]);
-    printf("\n");
-}
 
 int wt(vec e){
     int i,count=0;
@@ -3088,6 +3026,73 @@ int vor(vec v){
     }
     }
 }
+vec coda(uni on){
+    uni hola={0};
+    int i;
+
+    for(i=0;i<N-1;i++)
+    printf("%d=%d\n",i,ink(mltn(i,3)));
+    printf("%d\n",v2i(i2v(rotr(1234,17))));
+    //exit(1);
+
+    for(i=0;i<120;i++)
+        on.c[i]=i+1;
+
+    vec a[8]={0},inv_a[8]={0};
+    vec aa[30]={0},o[30]={0};
+
+for(i=0;i<120;i++)
+    a[0].x[i]=i;
+    for(i=0;i<32;i++)
+    a[1].x[i]=i;
+
+    random_shuffle(a[0].x,120);
+    random_shuffle(a[1].x,32);
+    for(i=0;i<120;i++){
+        printf("%d,",a[0].x[i]);
+    inv_a[0].x[a[0].x[i]]=i;
+    }
+    printf("\n");
+    //exit(1);
+    for(i=0;i<32;i++)
+    inv_a[1].x[a[1].x[i]]=i;
+
+    uni und={0};
+    for(i=0;i<120;i++)
+        und.c[i]=on.c[a[0].x[i]];
+    for(i=0;i<120;i++)
+    printf("%d,",und.c[i]);
+    printf("\n");
+    for(i=0;i<30;i++)
+    printf("%b\n,",und.d[i]);
+    printf("\n");
+    //exit(1);
+
+    uni dd={0};
+    uni tar[30]={0};
+    vec bo[30]={0};
+    for(i=0;i<30;i++){
+        printf("z%d\n",und.d[i]);
+        aa[i]=i2v(rotr(und.d[i],17));
+        for(int j=0;j<32;j++){
+            tar[i].c[j]=aa[i].x[a[1].x[j]];
+            //printf("%d,",aa[i].x[j]);
+        }
+        //dd.d[i]=v2i(tar[i]);
+        //printf("\n");
+    }
+    uni ao={0};
+    for(i=0;i<30;i++){
+        for(int j=0;j<32;j++){
+            bo[i].x[j]=tar[i].c[inv_a[1].x[j]];
+        }
+        ao.d[i]=rotr(v2i((bo[i])),15);
+        printf("zz%d,\n",ao.d[i]);
+    }    
+    //exit(1);
+
+}
+
 
 int main()
 {
@@ -3110,18 +3115,11 @@ int main()
     vec gg[K+1]={0},g0={0};
     int nn=3;
     int jj=1;
-    uni on={0},ola={0};
-   long long plaintext[] = {0x1234567890abcdef, 0x1234567890abcdef};
-   long long ciphertext[2] = { 0 };
-
-
-    for(i=0;i<N-1;i++)
-    printf("%d=%d\n",i,ink(mltn(i,3)));
-    //exit(1);
+    uni on={0};
 
     for(i=0;i<120;i++)
-        on.c[i]=i+1;
-    coda(on);  
+    on.x[i]=i+1;
+    coda(on);
     //exit(1);
 
     g0=keygen();
