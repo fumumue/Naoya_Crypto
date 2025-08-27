@@ -179,10 +179,12 @@ void main(void){
         for(i=0;i<23;i++)
         printf("%d,",t.x[i]);
         printf("\n");
+        printf("you are lucky.\n");
         exit(1);
     }
         n=0;
         m=0;
+        printf("('A`)\n");
     }
 
 
