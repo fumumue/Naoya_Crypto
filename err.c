@@ -73,7 +73,7 @@ int wt(vec a){
 
 void main(void){
     int k=11,i,count[4]={0},l=0;
-    vec x={0},h={1},r1={0},r2={0},y={0};
+    vec x={0},h={0},r1={0},r2={0},y={0};
     vec a={1,2,3};
     vec b={4,5,6};
 
@@ -87,8 +87,8 @@ void main(void){
     srand(clock());
     
     while(1){
-    memset(x.x,0,sizeof(vec));
-    memset(h.x,1,sizeof(23));
+    memset(x.x,0,sizeof(23));
+    memset(h.x,0,sizeof(23));
     memset(r1.x,0,sizeof(23));
     memset(r2.x,0,sizeof(23));
     memset(y.x,0,sizeof(23));
@@ -116,6 +116,14 @@ void main(void){
         }
         printf("b");
     }
+    while(count[3]<k){
+        l=rand()%23;
+        if(h.x[l]==0){
+        h.x[l]=1;
+        count[3]++;
+        }
+        printf("b");
+    }
     printf("\n");
 
     vec s={0},rr=xor(r1,or(r2,h));
@@ -128,12 +136,18 @@ void main(void){
 
     if(n<3 && o>3 && wt(u)>3 && wt(vv)>3)
     {
-        printf("n=%d o=%d u=%d,v=%d\n",n,o,wt(u),wt(vv));
+        printf("n=%d o=%d wt(u)=%d,wt(v)=%d\n",n,o,wt(u),wt(vv));
         printf("%d %b %d\n",n,m,count[2]);
         for(i=0;i<23;i++){
             m=(m<<1);
             m^=t.x[i];
         }
+        for(i=0;i<23;i++)
+        printf("%d,",u.x[i]);
+        printf("\n");
+        for(i=0;i<23;i++)
+        printf("%d,",vv.x[i]);
+        printf("\n");
         exit(1);
     }
         n=0;
