@@ -94,34 +94,59 @@ void main(void){
     memset(r2.x,0,sizeof(23));
     memset(y.x,0,sizeof(23));
 
-    count[2]++;
-    x.x[rand()%23]=1;
-    r1.x[rand()%23]=1;
+    count[6]++;
+    //x.x[rand()%23]=1;
+    //r1.x[rand()%23]=1;
     vec e={0};
     
-    e.x[rand()%23]=1;
+    //e.x[rand()%23]=1;
 
-    while(count[0]<k){
+    while(count[0]<1){
         l=rand()%23;
-        if(y.x[l]==0){
-        y.x[l]=1;
+        if(x.x[l]==0){
+        x.x[l]=1;
         count[0]++;
         }
         printf("a");
     }
-    while(count[1]<k){
+    while(count[1]<1){
+        l=rand()%23;
+        if(r1.x[l]==0){
+        r1.x[l]=1;
+        count[1]++;
+        }
+        printf("a");
+    }
+    while(count[2]<k){
         l=rand()%23;
         if(r2.x[l]==0){
         r2.x[l]=1;
-        count[1]++;
+        count[2]++;
         }
         printf("b");
     }
-    while(count[3]<k){
+        while(count[3]<k){
+        l=rand()%23;
+        if(y.x[l]==0){
+        y.x[l]=1;
+        count[3]++;
+        }
+        printf("a");
+    }
+    while(count[4]<1){
+        l=rand()%23;
+        if(e.x[l]==0){
+        e.x[l]=1;
+        count[4]++;
+        }
+        printf("a");
+    }
+
+    while(count[5]<k){
         l=rand()%23;
         if(h.x[l]==0){
         h.x[l]=1;
-        count[3]++;
+        count[5]++;
         }
         printf("b");
     }
@@ -184,6 +209,8 @@ void main(void){
     }
         n=0;
         m=0;
+        for(i=0;i<7;i++)
+        count[i]=0;
         printf("('A`)\n");
     }
 
