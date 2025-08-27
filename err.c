@@ -8,6 +8,20 @@ typedef struct {
    unsigned x[23];
 } vec;
 
+unsigned int m(unsigned int y, unsigned int z)
+{
+  unsigned int c;
+  
+  c=0;
+  while(y!=0){
+    if(y&1) c ^=z;
+    z<<=1; y>>=1;
+  }
+  return c;
+  
+}
+
+
 vec conv(vec a,vec b,int n){
     int i,l=0,j=0;
     vec c={0};
@@ -152,22 +166,17 @@ void main(void){
     }
     printf("\n");
 
-    vec s={0},rr=xor(r1,or(r2,h));
-    s=xor(x,or(h,y));
+    vec s=xor(x,or(h,y)),rr=xor(r1,or(r2,h));
     vec u=xor(r1,or(h,r2)),vv=xor(or(s,r1),e);
     vec t=xor(vv,or(u,y));
 
-    int n=wt(t),m=0,o=wt(or(or(h,y),r2));
+    int n=wt(t),o=wt(or(or(h,y),r2));
 
     if(n<=3 && o>3 && wt(u)>3 && wt(vv)>3)
     {
         printf("n=%d o=%d wt(u)=%d,wt(v)=%d\n",n,o,wt(u),wt(vv));
         printf("wr(x)=%d wt(h)=%d wt(r1)=%d,wt(r2)=%d,wt(y)=%d,wt(e)=%d\n",wt(x),wt(h),wt(r1),wt(r2),wt(y),wt(e));
-        for(i=0;i<23;i++){
-            m=(m<<1);
-            m^=t.x[i];
-        }
-        printf("%d %b %d\n",n,m,count[2]);
+
         printf("u=");
         for(i=0;i<23;i++)
         printf("%d,",u.x[i]);
@@ -205,10 +214,20 @@ void main(void){
         printf("%d,",t.x[i]);
         printf("\n");
         printf("you are lucky.\n");
+        unsigned gol=0b101011100011;
+        unsigned plain=0b11111111;
+        unsigned mm=0;
+        for(i=0;i<23;i++){
+            mm<<=1;
+            mm^=vv.x[i];
+            //printf("%d,",vv.x[i]);
+        }
+        //printf("\n");
+        unsigned cipher=m(plain,gol)^mm;
+        printf("%b %b\n",cipher,mm);
         exit(1);
     }
         n=0;
-        m=0;
         for(i=0;i<7;i++)
         count[i]=0;
         printf("('A`)\n");
