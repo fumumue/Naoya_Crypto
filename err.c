@@ -72,7 +72,7 @@ int wt(vec a){
 
 
 void main(void){
-    int k=11,i,count[4]={0},l=0;
+    int k=12,i,count[10]={0},l=0;
     vec x={0},h={0},r1={0},r2={0},y={0};
     vec a={1,2,3};
     vec b={4,5,6};
@@ -86,7 +86,8 @@ void main(void){
 
     srand(clock());
     
-    while(1){
+    //while(1)
+    {
     memset(x.x,0,sizeof(23));
     memset(h.x,0,sizeof(23));
     memset(r1.x,0,sizeof(23));
@@ -128,25 +129,55 @@ void main(void){
 
     vec s={0},rr=xor(r1,or(r2,h));
     s=xor(x,or(h,y));
-    vec t={0};
-    t=xor(e,xor(or(s,r2),or(rr,y)));
     vec u=xor(r1,or(h,r2)),vv=xor(or(s,r1),e);
+    vec t=xor(vv,or(u,y));
 
     int n=wt(t),m=0,o=wt(or(or(h,y),r2));
 
-    if(n<3 && o>3 && wt(u)>3 && wt(vv)>3)
+    if(n<=3 && o>3 && wt(u)>3 && wt(vv)>3)
     {
         printf("n=%d o=%d wt(u)=%d,wt(v)=%d\n",n,o,wt(u),wt(vv));
-        printf("%d %b %d\n",n,m,count[2]);
+        printf("wr(x)=%d wt(h)=%d wt(r1)=%d,wt(r2)=%d,wt(y)=%d,wt(e)=%d\n",wt(x),wt(h),wt(r1),wt(r2),wt(y),wt(e));
         for(i=0;i<23;i++){
             m=(m<<1);
             m^=t.x[i];
         }
+        printf("%d %b %d\n",n,m,count[2]);
+        printf("u=");
         for(i=0;i<23;i++)
         printf("%d,",u.x[i]);
         printf("\n");
+        printf("v=");
         for(i=0;i<23;i++)
         printf("%d,",vv.x[i]);
+        printf("\n");
+        printf("x=");
+        for(i=0;i<23;i++)
+        printf("%d,",x.x[i]);
+        printf("\n");
+        printf("h=");
+        for(i=0;i<23;i++)
+        printf("%d,",h.x[i]);
+        printf("\n");
+        printf("r1=");
+        for(i=0;i<23;i++)
+        printf("%d,",r1.x[i]);
+        printf("\n");
+        printf("r2=");
+        for(i=0;i<23;i++)
+        printf("%d,",r2.x[i]);
+        printf("\n");
+        printf("y=");
+        for(i=0;i<23;i++)
+        printf("%d,",y.x[i]);
+        printf("\n");
+        printf("e=");
+        for(i=0;i<23;i++)
+        printf("%d,",e.x[i]);
+        printf("\n");
+        printf("t=");
+        for(i=0;i<23;i++)
+        printf("%d,",t.x[i]);
         printf("\n");
         exit(1);
     }
