@@ -528,7 +528,7 @@ void main(void){
     {
         //if(i%12==0)
         x.x[11]=1;
-        x.x[5]=1;
+        //x.x[5]=1;
     }
     for(i=0;i<23;i++){
     if(i%3==0)
@@ -568,7 +568,7 @@ void main(void){
 
     
 
-    while(count[1]<4){
+    while(count[1]<1){
         l=rand()%23;
         if(r1.x[l]==0){
         r1.x[l]=1;
@@ -576,7 +576,7 @@ void main(void){
         }
         printf("a");
     }
-    while(count[2]<4){
+    while(count[2]<3){
         l=rand()%23;
         if(r2.x[l]==0){
         r2.x[l]=1;
@@ -584,7 +584,7 @@ void main(void){
         }
         printf("b");
     }
-    while(count[4]<2){
+    while(count[4]<1){
         l=rand()%23;
         if(e.x[l]==0){
         e.x[l]=1;
