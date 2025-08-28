@@ -42,6 +42,55 @@ unsigned int enc(unsigned int y, unsigned int z)
   
 }
 
+
+// 多項式の次数(default)
+int deg(vec a)
+{
+    int i, n = 0, flg = 0;
+
+    // #pragma omp parallel for
+    for (i = 0; i < DEG; i++)
+    {
+        if (a.x[i] != 0)
+        {
+            n = i;
+            flg = 1;
+        }
+    }
+    if (flg == 0)
+        return 0;
+
+    return n;
+}
+
+
+vec vmul(vec a, vec b,int R)
+{
+    int i, j, k, l;
+    vec c = {0};
+
+    k = deg(a);
+    l = deg(b);
+
+    if(l+k>N){
+        printf("blake %d\n",l+k);
+        exit(1);
+    }
+    i = 0;
+    while (i < k + 1)
+    {
+        for (j = 0; j < l + 1; j++)
+        {
+            if (a.x[i] > 0)
+                c.x[i + j] = (c.x[i + j] + a.x[i] * b.x[j]) % R;
+        }
+        i++;
+    }
+
+    return c;
+}
+
+
 //整数からベクトル型への変換
 vec i2v(unsigned long long n)
 {
@@ -91,26 +140,6 @@ oterm vLT(vec f)
     return t;
 }
 
-
-// 多項式の次数(default)
-int deg(vec a)
-{
-    int i, n = 0, flg = 0;
-
-    // #pragma omp parallel for
-    for (i = 0; i < DEG; i++)
-    {
-        if (a.x[i] != 0)
-        {
-            n = i;
-            flg = 1;
-        }
-    }
-    if (flg == 0)
-        return 0;
-
-    return n;
-}
 
 
 unsigned long long  gcd(unsigned long long  a, unsigned long long  b)
@@ -410,17 +439,59 @@ x^=j[i];
 return x;
 }
 
+#define SWAP(type, a, b) \
+  {                      \
+    type work = a;       \
+    a = b;               \
+    b = work;            \
+  }
+
+
+/*
+    Fisher-Yates shuffle による方法
+    配列の要素をランダムシャッフルする
+*/
+void random_shuffle(unsigned short *array, size_t size)
+{
+  for (size_t i = size; i > 1; --i)
+  {
+    size_t a = i - 1;
+    size_t b = rand() % i;
+    SWAP(int, array[a], array[b]);
+  }
+}
+
+
+void title(void){
+    printf("This is Naoya'n Crypto Demo. ");
+    printf("GPL3.0 by Naoya.\n\n");
+
+    return;
+}
+
+void look(vec a){
+    int i;
+
+    for(i=0;i<23;i++)
+    printf("%d,",a.x[i]);
+    printf("\n");
+}
+
 void main(void){
     int k=12,i,count[10]={0},l=0;
     vec x={0},h={0},r1={0},r2={0},y={0};
     vec a={1,2,3};
     vec b={4,5,6};
 
+    /*
     vec v=conv(a,b,3);
     for(i=0;i<3;i++)
     printf("%d,",v.x[i]);
     printf("\n");
     //exit(1);
+    */
+
+    title();
 
     //for(i=0;i<23;i++)
     {
@@ -441,6 +512,17 @@ void main(void){
     y.x[3]=1;
     y.x[5]=1;
     }
+    vec P={0};
+    for(i=0;i<23;i++)
+    P.x[i]=i;
+    random_shuffle(P.x,23);
+    look(P);
+    vec inv_P={0};
+    for(i=0;i<23;i++)
+    inv_P.x[P.x[i]]=i;
+    
+
+
     srand(clock());
     vec e={0};
     
@@ -487,56 +569,35 @@ void main(void){
 
     int n=wt(t),o=wt(xor(or(h,y),r2));
 
-    printf("wt(t)=%d,o=%d,wt(u)=%d,wt(v)=%d\n",n,o,wt(u),wt(vv));
+    printf("\nwt(t)=%d wt(r)=%d wt(s)=%d,wt(u)=%d,wt(v)=%d\n",n,o,wt(s),wt(u),wt(vv));
     if(n>0 && n<=3 && o>3 && wt(u)>3 && wt(vv)>3)
     {
-        printf("wt(t)=%d wt(r)=%d wt(s)=%d,wt(u)=%d,wt(v)=%d\n",n,o,wt(s),wt(u),wt(vv));
         printf("wr(x)=%d wt(h)=%d wt(r1)=%d,wt(r2)=%d,wt(y)=%d,wt(e)=%d\n",wt(x),wt(h),wt(r1),wt(r2),wt(y),wt(e));
 
         printf("Pub_key=\n");
         printf("s= ");
-        for(i=0;i<23;i++)
-        printf("%d,",s.x[i]);
-        printf("\n");
+        look(s);
         printf("h= ");
-        for(i=0;i<23;i++)
-        printf("%d,",h.x[i]);
-        printf("\n");
+        look(h);
         printf("Secret_key=\n");
         printf("x= ");
-        for(i=0;i<23;i++)
-        printf("%d,",x.x[i]);
-        printf("\n");
+        look(x);
         printf("y= ");
-        for(i=0;i<23;i++)
-        printf("%d,",y.x[i]);
-        printf("\n");
+        look(y);
         printf("chpher (u,v)=\n");
         printf("u= ");
-        for(i=0;i<23;i++)
-        printf("%d,",u.x[i]);
-        printf("\n");
+        look(u);
         printf("v= ");
-        for(i=0;i<23;i++)
-        printf("%d,",vv.x[i]);
-        printf("\n");
+        look(vv);
         printf("r= \n");
         printf("r1=");
-        for(i=0;i<23;i++)
-        printf("%d,",r1.x[i]);
-        printf("\n");
+        look(r1);
         printf("r2=");
-        for(i=0;i<23;i++)
-        printf("%d,",r2.x[i]);
-        printf("\n");
+        look(r2);
         printf("e= ");
-        for(i=0;i<23;i++)
-        printf("%d,",e.x[i]);
-        printf("\n");
+        look(e);
         printf("v-uy=\n   ");
-        for(i=0;i<23;i++)
-        printf("%d,",t.x[i]);
-        printf("\n");
+        look(t);
         printf("you are lucky.\n\n");
 
         unsigned gol=0b101011100011;
@@ -547,8 +608,11 @@ void main(void){
             mm^=t.x[i];
             //printf("%d,",vv.x[i]);
         }
-        unsigned cipher=v2i(xor(i2v(enc(plain,gol)),vv));
-        unsigned cipher2=v2i(xor(i2v(cipher),or(u,y)));
+
+        vec tmp=xor(i2v(enc(plain,gol)),vv);
+        unsigned cipher=v2i(tmp);
+        vec u2=xor(i2v(cipher),or(u,y));
+        unsigned cipher2=v2i(u2);
         unsigned decode=v2i(vdiv(i2v(cipher2^syndrome[sind(((cipher2)))]),i2v(gol)));
         unsigned w=0b11;
         
