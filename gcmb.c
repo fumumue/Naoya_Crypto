@@ -23,6 +23,7 @@ unsigned int ht2[11]={
 };
 
 
+
 unsigned int count,count2;
 typedef unsigned int seti;
 #define first(n) ((seti) ((1U << (n)) - 1U))
@@ -35,7 +36,7 @@ unsigned int u[32],ss[256];
 unsigned int model;
 
 unsigned sindy[2048]={0};
-
+unsigned inv_s[2048]={0};
 static unsigned short h2[8]={32884,16562,8424,4235,2135,1054,717,303};
 /*
 0b1000000001110100,
@@ -172,6 +173,7 @@ int e=0;
     int table[2048]={0};
     for(int j=0;j<2048;j++)
     {
+      /*
         uu=0;
         ss=0;
     for(i=0;i<11;i++){
@@ -179,20 +181,32 @@ int e=0;
     ss^=__builtin_popcount(ple.x[j]&ht2[i])%2;
     printf("%d,",__builtin_popcount(ple.x[j]&ht2[i])%2);
     }
+    
     if(sindy[ss]==0){
     sindy[ss]=ple.x[j];
     }else{
       printf("baka\n");
       exit(1);
     }
-    printf("\n");
+    */
     }
-  
-    for(i=0;i<2048;i++)
-    printf("%d=%b\n",i,sindy[i]);
+    for(i=0;i<2048;i++){
+    sindy[sind(ple.x[i])]=ple.x[i];
+    }
+    printf("\n");
+    
+    for(i=0;i<2048;i++){
+      printf("%d,",sindy[i]);
+    }
+    printf("\n");
+    exit(1);
+    unsigned d=0b111;
+
+    printf("\n%b ,%b\n",d,sindy[sind(d)]);
+    printf("\n");
     //exit(1);
 
-
+/*
 int mm[4096]={0};
 for(i=0;i<4096;i++){
   mm[i]=codec(i);
@@ -208,12 +222,20 @@ int c=codec(517)^0b10000000000000100000001;
   printf("m=%d %d\n",i,c);
   break;
  }
+  
 }
+ */
 //gappa();
 //exit(1);
 
 
 return 0;
+}
+
+void main(void){
+  fugo();
+
+  return;
 }
 
 
