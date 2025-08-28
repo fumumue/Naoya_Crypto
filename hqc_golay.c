@@ -446,9 +446,6 @@ void main(void){
     
     while(1)
     {
-    //memset(x.x,0,sizeof(23));
-    //memset(h.x,0,sizeof(23));
-    memset(r1.x,0,sizeof(23));
     for(i=0;i<23;i++){
     r1.x[i]=0;
     r2.x[i]=0;
@@ -490,6 +487,7 @@ void main(void){
 
     int n=wt(t),o=wt(xor(or(h,y),r2));
 
+    printf("wt(t)=%d,o=%d,wt(u)=%d,wt(v)=%d\n",n,o,wt(u),wt(vv));
     if(n>0 && n<=3 && o>3 && wt(u)>3 && wt(vv)>3)
     {
         printf("wt(t)=%d wt(r)=%d wt(s)=%d,wt(u)=%d,wt(v)=%d\n",n,o,wt(s),wt(u),wt(vv));
