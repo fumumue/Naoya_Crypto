@@ -597,16 +597,16 @@ void main(void){
     
     vec never={0};
 
-    vec s=xor(x,or(h,y)),rr=xor(r1,or(r2,h));
+    vec s=xor(x,or(h,y));
     vec u=xor(r1,or(h,r2)),vv=xor(or(s,r2),e);
     vec t=xor(vv,or(u,y));
-    if(wt(u)==0 || wt(or(u,y))==0)
+    if(wt(u)==0 || wt(conv(u,y,23))==0)
     exit(1);
 
-    int n=wt(t),o=wt(xor(or(h,y),r2));
+    int n=wt(t),o=wt(xor(conv(h,y,23),r2));
 
     printf("\nwt(t)=%d wt(r)=%d wt(s)=%d,wt(u)=%d,wt(v)=%d\n",n,o,wt(s),wt(u),wt(vv));
-    if(n>0 && n<=3 && o>3 && wt(u)>3 && wt(vv)>3)
+    if(n<=3 && wt(u)>3 && wt(vv)>3)
     {
         printf("wr(x)=%d wt(h)=%d wt(r1)=%d,wt(r2)=%d,wt(y)=%d,wt(e)=%d\n",wt(x),wt(h),wt(r1),wt(r2),wt(y),wt(e));
 
