@@ -274,7 +274,36 @@ vec vadd(vec a, vec b)
     // printf("deg=%d %d\n",deg(a),deg(b));
 
     for (i = 0; i < DEG; i++)
-        c.x[i] = (a.x[i] ^ b.x[i]) % N;
+        c.x[i] = (a.x[i] + b.x[i]) % N;
+
+    return c;
+}
+
+// 20200816:正規化したいところだがうまく行かない
+// 多項式の足し算
+vec vsub(vec a, vec b)
+{
+    vec c = {0};
+    // int i, j, k, l = 0;
+    vec h = {0}, f2 = {0}, g2 = {0};
+
+    for (int i = 0; i < DEG; i++)
+    {
+        if (a.x[i] >= b.x[i])
+            c.x[i] = (a.x[i] - b.x[i]) % N;
+        if (a.x[i] < b.x[i])
+            c.x[i] = (N + a.x[i] - b.x[i]) % N;
+    }
+
+    return c;
+}
+
+vec xor(vec a,vec b){
+    int i=0;
+    vec c={0};
+
+    for(i=0;i<23;i++)
+    c.x[i]=a.x[i]^b.x[i];
 
     return c;
 }
@@ -348,7 +377,7 @@ vec vdiv(vec f, vec g)
 
     h = vterml(g, c);
 
-    f = vadd(f, h);
+    f = xor(f, h);
     if (deg((f)) == 0 || deg((g)) == 0)
     {
       //printf ("blake2\n");
@@ -374,11 +403,11 @@ vec conv(vec a,vec b,int n){
             for(j=0;j<n;j++){
             if((i+j)==k){
             l+=(a.x[i]*b.x[j]);
-            printf("i=%d,j=%d, %d %d\n",i,j,a.x[i],b.x[j]);
+            //printf("i=%d,j=%d, %d %d\n",i,j,a.x[i],b.x[j]);
             }
             }
         }
-        printf("\n");
+        //printf("\n");
         c.x[k]=l%2;
     }
 
@@ -405,15 +434,6 @@ vec or(vec a,vec b){
 return c;
 }
 
-vec xor(vec a,vec b){
-    int i=0;
-    vec c={0};
-
-    for(i=0;i<23;i++)
-    c.x[i]=a.x[i]^b.x[i];
-
-    return c;
-}
 
 int wt(vec a){
     int i=0,k=0;
@@ -477,6 +497,17 @@ void look(vec a){
     printf("\n");
 }
 
+vec inn(vec a,vec b){
+    int i;
+    vec c={0};
+
+    for(i=0;i<23;i++)
+    c.x[i]=a.x[i]*b.x[i]%2;
+
+    return c;
+}
+
+
 void main(void){
     int k=12,i,count[10]={0},l=0;
     vec x={0},h={0},r1={0},r2={0},y={0};
@@ -505,12 +536,13 @@ void main(void){
     }
     //for(i=0;i<23;i++)
     {
-    //if(i%11==0)
+
     y.x[17]=1;
     y.x[7]=1;
     y.x[1]=1;
     y.x[3]=1;
     y.x[5]=1;
+
     }
     vec P={0};
     for(i=0;i<23;i++)
@@ -562,10 +594,14 @@ void main(void){
     }
 
     printf("\n");
+    
+    vec never={0};
 
     vec s=xor(x,or(h,y)),rr=xor(r1,or(r2,h));
     vec u=xor(r1,or(h,r2)),vv=xor(or(s,r2),e);
     vec t=xor(vv,or(u,y));
+    if(wt(u)==0 || wt(or(u,y))==0)
+    exit(1);
 
     int n=wt(t),o=wt(xor(or(h,y),r2));
 
@@ -610,8 +646,18 @@ void main(void){
         }
 
         vec tmp=xor(i2v(enc(plain,gol)),vv);
-        unsigned cipher=v2i(tmp);
-        vec u2=xor(i2v(cipher),or(u,y));
+        vec tmp2={0};
+        for(i=0;i<23;i++)
+        tmp2.x[i]=tmp.x[P.x[i]];
+        printf("Oh!=");
+        look(tmp2);
+        unsigned cipher=v2i(tmp2);
+        tmp=i2v(cipher);
+        for(i=0;i<23;i++)
+        tmp2.x[i]=tmp.x[inv_P.x[i]];
+        printf("reverse=\n");
+        look(tmp2);
+        vec u2=xor(tmp2,or(u,y));
         unsigned cipher2=v2i(u2);
         unsigned decode=v2i(vdiv(i2v(cipher2^syndrome[sind(((cipher2)))]),i2v(gol)));
         unsigned w=0b11;
