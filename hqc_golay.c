@@ -31,7 +31,7 @@ unsigned syndrome[2048]={0,4096,8192,12288,16384,20480,24576,28672,32768,36864,4
 
 unsigned int enc(unsigned int y, unsigned int z)
 {
-  unsigned int c;
+  unsigned long long  c;
   
   c=0;
   while(y!=0){
@@ -43,7 +43,7 @@ unsigned int enc(unsigned int y, unsigned int z)
 }
 
 //整数からベクトル型への変換
-vec i2v(unsigned int n)
+vec i2v(unsigned long long n)
 {
     vec v = {0};
     int i = 0;
@@ -58,16 +58,15 @@ vec i2v(unsigned int n)
 }
 
 //ベクトル型から整数への変換
-unsigned v2i(vec v)
+unsigned long long v2i(vec v)
 {
-    unsigned long long int d = 0, i, e = 0;
+    unsigned long long int d = 0, i;
 
-    for (i = 0; i < 32; i++)
+    for (i = 0; i < 64; i++)
     {
-        e = v.x[i];
-        d ^= (e << i);
+        d ^= (v.x[i] << i);
     }
-
+    
     return d;
 }
 
@@ -114,7 +113,7 @@ int deg(vec a)
 }
 
 
-unsigned short gcd(unsigned short a, unsigned short b)
+unsigned long long  gcd(unsigned long long  a, unsigned long long  b)
 {
   int r, tmp;
 
@@ -152,36 +151,36 @@ unsigned short gcd(unsigned short a, unsigned short b)
 
 
 // 整数の逆数
-short inv(short a, short n)
+unsigned long long  inv(unsigned long long  a, unsigned long long  n)
 {
 
     if(gcd(a,n)!=1){
         printf("(a,n)!=1\n");
         return -1;
     }
-    short d = n;
-    short x = 0;
-    short s = 1;
+    unsigned long long  d = n;
+    unsigned long long  x = 0;
+    unsigned long long  s = 1;
     while (a != 0)
     {
-        short q = d / a;
-        short r = d % a;
+        unsigned long long  q = d / a;
+        unsigned long long  r = d % a;
         d = a;
         a = r;
-        short t = x - q * s;
+        unsigned long long  t = x - q * s;
         x = s;
         s = t;
     }
-    short gcd = d; // $\gcd(a, n)$
+    unsigned long long  gcd = d; // $\gcd(a, n)$
 
     return ((x + n) % (n / d));
 }
 
 // aに何をかけたらbになるか
- short
-equ( short a,  short b)
+ unsigned long long 
+equ( unsigned long long  a,  unsigned long long  b)
 {
-    // for(short i=0;i<N;i++)
+    // for(unsigned long long  i=0;i<N;i++)
     if (b == 0)
         return 0;
     if (a == 1)
@@ -193,7 +192,7 @@ equ( short a,  short b)
 }
 
 //モニック多項式にする
-vec coeff(vec f,  short d)
+vec coeff(vec f,  unsigned long long  d)
 {
   int i, j, k;
   vec a, b;
@@ -344,8 +343,8 @@ vec conv(vec a,vec b,int n){
         l=0;
         for(i=0;i<n;i++){
             for(j=0;j<n;j++){
-            if((i+j)==k && a.x[i]<2 && b.x[j]<2){
-            l+=(a.x[i]^b.x[j]);
+            if((i+j)==k){
+            l+=(a.x[i]*b.x[j]);
             printf("i=%d,j=%d, %d %d\n",i,j,a.x[i],b.x[j]);
             }
             }
@@ -398,9 +397,9 @@ int wt(vec a){
     return k;
 }
 
-unsigned sind(unsigned a){
+unsigned long long sind(unsigned long long a){
 int i,j[11]={0};
-unsigned x=0;
+unsigned long long x=0;
 for(i=0;i<11;i++){
     x<<=1;
 j[i]=__builtin_popcount(H[i]&a)%2;
@@ -426,6 +425,7 @@ void main(void){
     //for(i=0;i<23;i++)
     {
         //if(i%12==0)
+        x.x[11]=1;
         x.x[5]=1;
     }
     for(i=0;i<23;i++){
@@ -437,6 +437,9 @@ void main(void){
     //if(i%11==0)
     y.x[17]=1;
     y.x[7]=1;
+    y.x[1]=1;
+    y.x[3]=1;
+    y.x[5]=1;
     }
     srand(clock());
     vec e={0};
@@ -451,7 +454,6 @@ void main(void){
     r2.x[i]=0;
     e.x[i]=0;
     }
-    //memset(y.x,0,sizeof(23));
 
     
 
@@ -471,7 +473,7 @@ void main(void){
         }
         printf("b");
     }
-    while(count[4]<1){
+    while(count[4]<2){
         l=rand()%23;
         if(e.x[l]==0){
         e.x[l]=1;
@@ -493,26 +495,34 @@ void main(void){
         printf("wt(t)=%d wt(r)=%d wt(s)=%d,wt(u)=%d,wt(v)=%d\n",n,o,wt(s),wt(u),wt(vv));
         printf("wr(x)=%d wt(h)=%d wt(r1)=%d,wt(r2)=%d,wt(y)=%d,wt(e)=%d\n",wt(x),wt(h),wt(r1),wt(r2),wt(y),wt(e));
 
-        printf("s=");
+        printf("Pub_key=\n");
+        printf("s= ");
         for(i=0;i<23;i++)
         printf("%d,",s.x[i]);
         printf("\n");
-        printf("u=");
-        for(i=0;i<23;i++)
-        printf("%d,",u.x[i]);
-        printf("\n");
-        printf("v=");
-        for(i=0;i<23;i++)
-        printf("%d,",vv.x[i]);
-        printf("\n");
-        printf("x=");
-        for(i=0;i<23;i++)
-        printf("%d,",x.x[i]);
-        printf("\n");
-        printf("h=");
+        printf("h= ");
         for(i=0;i<23;i++)
         printf("%d,",h.x[i]);
         printf("\n");
+        printf("Secret_key=\n");
+        printf("x= ");
+        for(i=0;i<23;i++)
+        printf("%d,",x.x[i]);
+        printf("\n");
+        printf("y= ");
+        for(i=0;i<23;i++)
+        printf("%d,",y.x[i]);
+        printf("\n");
+        printf("chpher (u,v)=\n");
+        printf("u= ");
+        for(i=0;i<23;i++)
+        printf("%d,",u.x[i]);
+        printf("\n");
+        printf("v= ");
+        for(i=0;i<23;i++)
+        printf("%d,",vv.x[i]);
+        printf("\n");
+        printf("r= \n");
         printf("r1=");
         for(i=0;i<23;i++)
         printf("%d,",r1.x[i]);
@@ -521,19 +531,16 @@ void main(void){
         for(i=0;i<23;i++)
         printf("%d,",r2.x[i]);
         printf("\n");
-        printf("y=");
-        for(i=0;i<23;i++)
-        printf("%d,",y.x[i]);
-        printf("\n");
-        printf("e=");
+        printf("e= ");
         for(i=0;i<23;i++)
         printf("%d,",e.x[i]);
         printf("\n");
-        printf("t=");
+        printf("v-uy=\n   ");
         for(i=0;i<23;i++)
         printf("%d,",t.x[i]);
         printf("\n");
-        printf("you are lucky.\n");
+        printf("you are lucky.\n\n");
+
         unsigned gol=0b101011100011;
         unsigned plain=0b11111111;
         unsigned mm=0;
@@ -542,20 +549,17 @@ void main(void){
             mm^=t.x[i];
             //printf("%d,",vv.x[i]);
         }
-        printf("%b\n",v2i(xor(vv,or(u,y))));
-        printf("\n");
-        //exit(1);
         unsigned cipher=v2i(xor(i2v(enc(plain,gol)),vv));
         unsigned cipher2=v2i(xor(i2v(cipher),or(u,y)));
         unsigned decode=v2i(vdiv(i2v(cipher2^syndrome[sind(((cipher2)))]),i2v(gol)));
         unsigned w=0b11;
         
 
-        printf("golay=%b\ntext = %b\n",gol,plain);
+        printf("golay= %b\ntext = %b\n",gol,plain);
         printf("cipher=%b\n",cipher);
-        printf("err=%b\n",mm);
+        printf("err=   %b\n",mm);
         printf("decode=%b\n",decode);
-        printf("times=%d\n",count[6]);
+        printf("times= %d\n",count[6]);
         exit(1);
     }
         n=0;
