@@ -15,7 +15,7 @@
 #include "struct.h"
 #include "chash-p.c"
 #include "golay.c"
-#include "gcmb.c"
+//#include "gcmb.c"
 
 #define SEPARABLE 0
 #define MATRIX_SIZE K

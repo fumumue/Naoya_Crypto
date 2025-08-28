@@ -4,12 +4,9 @@
 #include <string.h>
 #include <assert.h>
 
-#define N 257
-#define K 120
-#define DEG 520
 
+#include "global-p.h"
 #include "struct.h"
-
 
 
 unsigned int H[11]={
@@ -508,7 +505,7 @@ vec inn(vec a,vec b){
 }
 
 
-void main(void){
+void encode(void){
     int k=12,i,count[10]={0},l=0;
     vec x={0},h={0},r1={0},r2={0},y={0};
     vec a={1,2,3};
@@ -524,26 +521,11 @@ void main(void){
 
     title();
 
-    //for(i=0;i<23;i++)
-    {
-        //if(i%12==0)
-        x.x[11]=1;
-        //x.x[5]=1;
-    }
-    for(i=0;i<23;i++){
-    if(i%3==0)
-    h.x[i]=1;
-    }
-    //for(i=0;i<23;i++)
-    {
-
+    // about
+    x.x[11]=1;
+    h.x[5]=1;
     y.x[17]=1;
-    y.x[7]=1;
-    y.x[1]=1;
-    y.x[3]=1;
-    y.x[5]=1;
 
-    }
     vec P={0};
     for(i=0;i<23;i++)
     P.x[i]=i;
@@ -552,7 +534,6 @@ void main(void){
     vec inv_P={0};
     for(i=0;i<23;i++)
     inv_P.x[P.x[i]]=i;
-    
 
 
     srand(clock());
@@ -565,7 +546,6 @@ void main(void){
     r2.x[i]=0;
     e.x[i]=0;
     }
-
     
 
     while(count[1]<1){
@@ -576,7 +556,7 @@ void main(void){
         }
         printf("a");
     }
-    while(count[2]<3){
+    while(count[2]<1){
         l=rand()%23;
         if(r2.x[l]==0){
         r2.x[l]=1;
@@ -597,16 +577,14 @@ void main(void){
     
     vec never={0};
 
-    vec s=xor(x,or(h,y));
-    vec u=xor(r1,or(h,r2)),vv=xor(or(s,r2),e);
-    vec t=xor(vv,or(u,y));
-    if(wt(u)==0 || wt(conv(u,y,23))==0)
-    exit(1);
+    vec s=or(x,conv(h,y,23));
+    vec u=or(r1,conv(h,r2,23)),vv=or(conv(s,r2,23),e);
+    vec t=or(vv,conv(u,y,23));
 
-    int n=wt(t),o=wt(xor(conv(h,y,23),r2));
+    int n=wt(t),o=wt(or(conv(h,y,23),r2));
 
     printf("\nwt(t)=%d wt(r)=%d wt(s)=%d,wt(u)=%d,wt(v)=%d\n",n,o,wt(s),wt(u),wt(vv));
-    if(n<=3 && wt(u)>3 && wt(vv)>3)
+    if(n>0 && n<=3 && wt(u)>0 && wt(vv)>0)
     {
         printf("wr(x)=%d wt(h)=%d wt(r1)=%d,wt(r2)=%d,wt(y)=%d,wt(e)=%d\n",wt(x),wt(h),wt(r1),wt(r2),wt(y),wt(e));
 
@@ -657,7 +635,7 @@ void main(void){
         tmp2.x[i]=tmp.x[inv_P.x[i]];
         printf("reverse=\n");
         look(tmp2);
-        vec u2=xor(tmp2,or(u,y));
+        vec u2=or(tmp2,conv(u,y,23));
         unsigned cipher2=v2i(u2);
         unsigned decode=v2i(vdiv(i2v(cipher2^syndrome[sind(((cipher2)))]),i2v(gol)));
         unsigned w=0b11;
@@ -677,6 +655,13 @@ void main(void){
         count[6]++;
     }
 
+
+    return;
+}
+
+void main(void){
+
+    encode();
 
     return;
 }
