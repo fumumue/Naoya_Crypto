@@ -2611,60 +2611,6 @@ static inline unsigned rotr(uint32_t x, uint8_t n)
 	return x >> n | x << (32 - n);
 }
 
-/**
- * ascon_permutate - performs the permutation
- *
- * @s: the state
- * @nr: the number of rounds
- *
- * Performs the main permutation for ascon algorithms using the given
- * number of rounds.
- */
-static void ascon_permutate(struct state *s, uint8_t nr)
-{
-	uint64_t t[5];
-
-	for (uint8_t i = 12 - nr; i < 12; ++i) {
-		// constant addition layer
-		s->x[2] ^= (((uint64_t) (0xf) - i) << 4) | i;
-
-		// substitution layer (SBox)
-		s->x[0] ^= s->x[4];
-		s->x[4] ^= s->x[3];
-		s->x[2] ^= s->x[1];
-		t[0] = s->x[0];
-		t[1] = s->x[1];
-		t[2] = s->x[2];
-		t[3] = s->x[3];
-		t[4] = s->x[4];
-		t[0] = ~t[0];
-		t[1] = ~t[1];
-		t[2] = ~t[2];
-		t[3] = ~t[3];
-		t[4] = ~t[4];
-		t[0] &= s->x[1];
-		t[1] &= s->x[2];
-		t[2] &= s->x[3];
-		t[3] &= s->x[4];
-		t[4] &= s->x[0];
-		s->x[0] ^= t[1];
-		s->x[1] ^= t[2];
-		s->x[2] ^= t[3];
-		s->x[3] ^= t[4];
-		s->x[4] ^= t[0];
-		s->x[1] ^= s->x[0];
-		s->x[0] ^= s->x[4];
-		s->x[3] ^= s->x[2];
-		s->x[2] = ~s->x[2];
-
-		// linear diffusion layer
-		s->x[0] ^= rotr(s->x[0], 19) ^ rotr(s->x[0], 28);
-		s->x[1] ^= rotr(s->x[1], 61) ^ rotr(s->x[1], 39);
-		s->x[2] ^= rotr(s->x[2], 1) ^ rotr(s->x[2], 6);
-		s->x[3] ^= rotr(s->x[3], 10) ^ rotr(s->x[3], 17);
-		s->x[4] ^= rotr(s->x[4], 7) ^ rotr(s->x[4], 41);
-	}
-}
 
 
 int vor(vec v){
@@ -2675,6 +2621,7 @@ int vor(vec v){
     }
     }
 }
+
 vec coda(uni on){
     uni hola={0};
     int i;
@@ -2782,7 +2729,6 @@ int main()
     //exit(1);
 
     g0=keygen();
-    //exit(1);
 
     for(i=0;i<K/2-1;i++)
     mm.x[i]=17;
@@ -2809,19 +2755,11 @@ int main()
 
     vec c=vmul(mm,g0,N);
     printpoln(c);
-    //c=vdiv(c,g0);
-    //printpoln(c);
-    //exit(1);
 
     vec b={0}; //vmod(c,ff20.h);
     //exit(1);
     for(i=0;i<deg(c);i++)
     b.x[i]=m(c.x[i],gol);
-    //for(i=0;i<deg(b);i++)
-    //c.x[i]=v2i(bdiv(i2v(b.x[i]),i2v(gol)));
-    //c=vdiv(c,g0);
-    //printpoln(c);
-    //exit(1);
 
     unsigned int P[N]={0},inv_P[N]={0};
     for(i=0;i<N;i++)
@@ -2834,17 +2772,10 @@ int main()
 
     srand(clock());
 
-    vec o={0};
-    //for(i=0;i<N;i++)
-    //o.x[i]=c.x[P[i]];
 
     unsigned plain=0b10000001;
     printf("%b %b\n",v2i(bdiv(i2v(m(gol,plain)),i2v(gol))),plain);
-    //exit(1);
 
-    //for(i=0;i<N;i++){
-    //b.x[i]=m(c.x[i],gol);
-    //}
     printpoln(b);
     printf(" ==bbc\n");
     //exit(1);
@@ -2860,75 +2791,37 @@ int main()
     int geb=v2i(bdiv(i2v(plain),i2v(gol)));
     printf("%b\n",geb);
     //exit(1);
-    
-    //van(K);
-    //mkd(g0, K);
 
     vec err={0},sin={0},d={0};
-    //for(i=0;i<T-1;i++)
-    //err.x[i]=1;
-    //err.x[N-2]=1;
     mkerr(err.x,T);
-    //exit(1);
     vec e=vadd(err,c);
     printf("dioscroites=");
     printpoln(e);
     
-    //for(i=0;i<N;i++)
-    //e.x[i]=e.x[i]^syndrome[sind(e.x[i])];
     printf("e=");
     printpoln(e);
     printf("b=");
     printpoln(b);
     vec vvc=i2v(gol);
-    //for(i=0;i<N;i++)
-    //e.x[i]=v2i(vdiv(i2v(b.x[i]),vvc));
-    //e=vdiv(e,g0);
     printpoln(e);
-    //exit(1);
     
-    int j=1,n=3,cont=0;
-    for(i=1;i<K+1;i++){
-        printf("n=%d\n",n);
-    printf("%d,",trace(e,n));
-    printf("\n");
-    printf("a%d,",trace(e,mltn(i,3)));
-    sin.x[i-1]=trace(e,mltn(i,3));
-    if(sin.x[i-1]>0)
-    cont++;
-    n*=3;
-    n%=N;
-    }
+    // trace を使って受信後からシンドロームを計算する
+    sin=zind(e);
+
     printpoln(sin);
-    printf("%d\n",cont);
-    //exit(1);
 
     printf("\n");
     printpoln(err);
-    vec sk2={0};
-    //exit(1);
     
-    vec e2={0},ea={0};
-    //printf("%d %d\n",wt(ea),wt(err));
-    //vor(ea);
+    vec ea={0};
 
     ymo yy=bm_itr(sin.x);
     x=chen(yy.f);
-    //exit(1);
-    /*
-    for(i=0;i<N;i++){
-        if(x.x[i]==0)
-        x.x[i]=256;
-        //ea.x[x.x[i]]=1;
-    }
-    */
+
     for(i=0;i<N;i++){
         if(x.x[i]>0)
         ea.x[x.x[i]]=1;
     }
-    //printpoln(ea);
-    //printpoln(err);
-    //exit(1);
 
     e2=vsub(e,(ea));
     for(i=0;i<N;i++){
@@ -2948,10 +2841,10 @@ int main()
     printf(" ==Uh!\n");
     exit(1);
     
-    //for(i=0;i<T;i++)
-
-    //exit(1);
-    //sin=msm(d);
+    
+    //生成行列を使いたいときはこれを使う。主にGoppa符号の時
+    //van(K);
+    //mkd(g0, K);
 
     while (1)
     {
@@ -2991,15 +2884,13 @@ int main()
          }
          //exit(1);
          // mkd(1);
-        MTX b = {0};
 
-        //for (i = 0; i < K; i++)
-        //    v.x[K - 1 - i] = x.x[i];
-        //printpol((v));
-        //printf(" ==synpol\n");
         printpol((v));
         printf(" ==synpol\n");
-        /*
+
+        //sol と bm_itr は同じだけど bm のほうが早い
+         /*
+        MTX b = {0};
         for (i = 0; i < K / 2; i++)
         {
             for (int j = 0; j < K / 2 + 1; j++)
@@ -3017,21 +2908,9 @@ int main()
             printf("\n");
         }
 
-        //exit(1);
-
         x = sol(b, 0, K / 2);
         */
-        /*
-        for (i = 0; i < N; i++)
-        {
-            if (z1[i] > 0 && x.x[i] == 0)
-            {
-                printf("baka=%d %d %d\n", i, z1[i], x.x[i]);
-                // exit(1);
-            }
-        }
-        */
-        //exit(1);
+
         x=ev(x,v);
         //exit(1);
         int flg = 0,yo=0;
