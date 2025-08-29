@@ -13,7 +13,7 @@
 
 #include "golay.c"
 #include "hqc_golay.c"
-//#include "gcmb.c"
+
 
 #define SEPARABLE 0
 #define MATRIX_SIZE K
@@ -1777,7 +1777,7 @@ vec bms( short s[])
 
              short a;
             a = (m < 0) ? 1 : inv(d[m],N);
-            f = vadd(f, vmul(kof2((d[k]* a), g), v,N));
+            f = vadd2(f, vmul(kof2((d[k]* a), g), v,N),N);
             if (L <= k / 2)
             {
                 L = k + 1 - L;
@@ -2750,7 +2750,6 @@ int main()
     fair ff20={0};
     unsigned gol=0b101011100011;
 
-    srand(clock());
 
     vec v = {2,4,0,1}, x={30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
     //{30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
@@ -2779,32 +2778,78 @@ int main()
     mm.x[K/2]=1;
 
     vec c=vmul(mm,g0,N);
-    vec b={0}; //vmod(c,ff20.h);
-    for(i=0;i<M;i++)
-    b.x[i]=m(gol,c.x[i]);
-    printpoln(b);
+    printpoln(c);
+    //exit(1);
+    c=vdiv(c,g0);
+    printpoln(c);
     //exit(1);
 
+    unsigned short P[N]={0},iv_P[N]={0};
+    for(i=0;i<N;i++)
+    P[i]=i;
+    random_shuffle(P,N);
+    for(i=0;i<N;i++)
+    printf("%d,",P[i]);
+    printf("\n");
+    //exit(1);
+
+    srand(clock());
+
+    vec o={0};
+    //for(i=0;i<N;i++)
+    //o.x[i]=c.x[P[i]];
+
+    vec b={0}; //vmod(c,ff20.h);
+    unsigned plain=0b11111111;
+    printf("%b %b\n",v2i(bdiv(i2v(m(gol,plain)),i2v(gol))),plain);
+    //exit(1);
+
+    printf("%b\n",v2i(vdiv(i2v(b.x[i]),i2v(gol))));
+    //b.x[i]=v2i(vdiv(i2v(b.x[i]),i2v(gol)));
+    //printf("%d\n",b.x[i]);
+    
+    b=vdiv(c,g0);
+    printpoln(b);
+    fugo();
+    //exit(1);
+    
     //van(K);
     //mkd(g0, K);
 
-    vec err={0},sin={0};
+    vec err={0},sin={0},d={0};
     //for(i=0;i<T-1;i++)
     //err.x[i]=1;
     //err.x[N-2]=1;
     mkerr(err.x,T);
     //exit(1);
-    vec d=vadd(err,c);
+    vec e=vxor(err,c);
+    printf("dioscroites=");
+    printpoln(e);
+    
+    for(i=0;i<N;i++)
+    e.x[i]=e.x[i]^syndrome[sind(e.x[i])];
+    printf("e=");
+    printpoln(e);
+    printf("b=");
+    printpoln(b);
+    vec vvc=i2v(gol);
+    for(i=0;i<N;i++)
+    e.x[i]=v2i(vdiv(i2v(b.x[i]),vvc));
+    e=vdiv(e,g0);
+    printpoln(e);
+    exit(1);
+    
     int j=1,n=3;
     for(i=1;i<K+1;i++){
         printf("n=%d\n",n);
-    printf("%d,",trace(d,n));
+    printf("%d,",trace(e,n));
     printf("\n");
-    printf("a%d,",trace(d,mltn(i,3)));
-    sin.x[i-1]=trace(d,mltn(i,3));
+    printf("a%d,",trace(e,mltn(i,3)));
+    sin.x[i-1]=trace(e,mltn(i,3));
     n*=3;
     n%=N;
     }
+    printpoln(sin);
     //exit(1);
 
     printf("\n");
@@ -2812,8 +2857,8 @@ int main()
     vec sk2={0};
     //exit(1);
     vec e2={0},ea={0};
-    printf("%d %d\n",wt(ea),wt(err));
-    vor(ea);
+    //printf("%d %d\n",wt(ea),wt(err));
+    //vor(ea);
 
     ymo yy=bm_itr(sin.x);
     x=chen(yy.f);
@@ -2833,7 +2878,7 @@ int main()
     //printpoln(err);
     //exit(1);
 
-    e2=vsub(d,(ea));
+    e2=vsub(e,(ea));
     for(i=0;i<N;i++){
         if(err.x[i]!=ea.x[i]){
             printf("%d %d %d\n",i,err.x[i],ea.x[i]);
@@ -2841,11 +2886,13 @@ int main()
         }
     }
     //exit(1);
-    for(i=0;i<N;i++)
+    for(i=0;i<T;i++)
     printf("%d,",x.x[i]);
     
-    printpoln(d);
+    //printpoln(d);
     d=vdiv(e2,g0);
+    printf("\n");
+
     printpoln(d);
     exit(1);
     
