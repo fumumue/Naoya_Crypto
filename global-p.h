@@ -13,5 +13,5 @@
 #define T (K / 2) // weight of error vector
 #define Q K*2
 
-unsigned short mat[N][K*E] = {0};
-unsigned short ma[N][K*E] = {0};
+unsigned int mat[N][K*E] = {0};
+unsigned int ma[N][K*E] = {0};

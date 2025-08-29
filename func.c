@@ -29,8 +29,8 @@ vec vmul(vec a, vec b,int R)
     l = deg(b);
 
     if(l+k>N){
-        printf("blake %d\n",l+k);
-        //exit(1);
+        printf("blake %d\n",l+k);        
+        exit(1);
     }
     i = 0;
     while (i < k + 1)

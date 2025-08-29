@@ -37,7 +37,7 @@ unsigned int model;
 
 unsigned sindy[2048]={0};
 unsigned inv_s[2048]={0};
-static unsigned short h2[8]={32884,16562,8424,4235,2135,1054,717,303};
+static unsigned int h2[8]={32884,16562,8424,4235,2135,1054,717,303};
 /*
 0b1000000001110100,
 0b0100000010110010,
@@ -106,7 +106,7 @@ tri printest(seti s,int t1)
   unsigned int b=0,j;
   char t[24];
   tri tt={0};
-  unsigned short tmp=0;
+  unsigned int tmp=0;
   unsigned vv=0;
 
   for(i=0;i<NN;i++){
@@ -232,11 +232,6 @@ int c=codec(517)^0b10000000000000100000001;
 return 0;
 }
 
-void main(void){
-  fugo();
-
-  return;
-}
 
 
 /*

@@ -11,7 +11,7 @@
 
 int P[N] = {0};
 int inv_P[N]={0};
-short x[5][N]={0};
+int x[5][N]={0};
 
 #define str_length 128
 #define password_length 256
@@ -62,11 +62,11 @@ void printArray(const int *array, size_t size)
   printf("\n");
 }
 
-short p[N]={0};
+int p[N]={0};
 void mkcycle()
 {
   int i, j, pko, flg2, l, n, ll,  cnt3 = 0, ii;
-  unsigned short cnt, k, count = 0, kk;
+  unsigned int cnt, k, count = 0, kk;
   ;
 //  unsigned long long int o;
 
@@ -346,12 +346,12 @@ int chkp(int *x)
   return 0;
 }
 
-void merge(unsigned short A[], unsigned short B[], unsigned short left, unsigned short mid, unsigned short right)
+void merge(unsigned int A[], unsigned int B[], unsigned int left, unsigned int mid, unsigned int right)
 {
-  unsigned short i = left;
-  unsigned short j = mid;
-  unsigned short k = 0;
-  unsigned short l;
+  unsigned int i = left;
+  unsigned int j = mid;
+  unsigned int k = 0;
+  unsigned int l;
   while (i < mid && j < right)
   {
     if (A[i] <= A[j])
@@ -383,9 +383,9 @@ void merge(unsigned short A[], unsigned short B[], unsigned short left, unsigned
   }
 }
 
-void merge_sort(unsigned short A[], unsigned short B[], unsigned short left, unsigned short right)
+void merge_sort(unsigned int A[], unsigned int B[], unsigned int left, unsigned int right)
 {
-  unsigned short mid;
+  unsigned int mid;
   if (left == right || left == right - 1)
   {
     return;
@@ -396,16 +396,16 @@ void merge_sort(unsigned short A[], unsigned short B[], unsigned short left, uns
   merge(A, B, left, mid, right);
 }
 
-void merge_rand(unsigned short *a, int n)
+void merge_rand(unsigned int *a, int n)
 {
-  // unsigned short a[10000] = {0}; //{8,4,7,2,1,3,5,6,9,10};
-  unsigned short c[65535] = {0};
-  unsigned short b[65535] = {0};
-  // const unsigned short n = 10;
+  // unsigned int a[10000] = {0}; //{8,4,7,2,1,3,5,6,9,10};
+  unsigned int c[65535] = {0};
+  unsigned int b[65535] = {0};
+  // const unsigned int n = 10;
   int i;
 
   // srand(clock());
-  memset(a, 0, sizeof(unsigned short));
+  memset(a, 0, sizeof(unsigned int));
   for (i = 0; i < n; i++)
     a[i] = rand() % 65536;
 
@@ -433,7 +433,7 @@ void merge_rand(unsigned short *a, int n)
     Fisher-Yates shuffle による方法
     配列の要素をランダムシャッフルする
 */
-void random_shuffle(unsigned short *array, size_t size)
+void random_shuffle(unsigned int *array, size_t size)
 {
   for (size_t i = size; i > 1; --i)
   {
@@ -446,7 +446,7 @@ void random_shuffle(unsigned short *array, size_t size)
 /*
     配列の要素を出力
 */
-void print_array(const unsigned short *array, size_t size)
+void print_array(const unsigned int *array, size_t size)
 {
   for (size_t i = 0; i < size; ++i)
   {
@@ -514,8 +514,8 @@ void seed(void)
 }
 
 
-unsigned short tabloog[N] = {0};
-unsigned short tabloof[N] = {0};
+unsigned int tabloog[N] = {0};
+unsigned int tabloof[N] = {0};
 /*
 void mktbl()
 {
