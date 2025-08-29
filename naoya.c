@@ -2823,7 +2823,7 @@ int main()
         ea.x[x.x[i]]=1;
     }
 
-    e2=vsub(e,(ea));
+    vec e2=vsub(e,(ea));
     for(i=0;i<N;i++){
         if(err.x[i]!=ea.x[i]){
             printf("%d %d %d\n",i,err.x[i],ea.x[i]);
@@ -2833,6 +2833,7 @@ int main()
     //exit(1);
     for(i=0;i<T;i++)
     printf("%d,",x.x[i]);
+    printf("\n\n");
     
     //printpoln(d);
     d=vdiv(e2,g0);
