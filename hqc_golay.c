@@ -261,7 +261,7 @@ vec vxor(vec a, vec b)
     // printf("deg=%d %d\n",deg(a),deg(b));
 
     for (i = 0; i < DEG; i++)
-        c.x[i] = (a.x[i] ^ b.x[i]) % N;
+        c.x[i] = (a.x[i] ^ b.x[i]);
 
     return c;
 }

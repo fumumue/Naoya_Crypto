@@ -2592,9 +2592,9 @@ vec keygen(){
 
 
 typedef union {
-    unsigned long long int x[15];
-    unsigned d[30];
-    unsigned int c[120];
+    unsigned long long int x[K/2];
+    unsigned d[K];
+    unsigned char c[K*4];
 } uni;
 
 /**
@@ -2631,8 +2631,8 @@ vec coda(uni on){
     printf("%d\n",v2i(i2v(rotr(1234,17))));
     //exit(1);
 
-    for(i=0;i<K;i++)
-        on.c[i]=i+1;
+    //for(i=0;i<K;i++)
+    //    on.c[i]=i+1;
 
     vec a[8]={0},inv_a[8]={0};
     vec aa[30]={0},o[30]={0};
@@ -2665,27 +2665,38 @@ for(i=0;i<K;i++)
     for(i=0;i<K;i++)
     printf("z%d,",und.c[i]);
     printf("\n");
-    for(i=0;i<N/4;i++)
+    for(i=0;i<K/4;i++)
     printf("%b\n,",und.d[i]);
     printf("\n");
     //exit(1);
 
     uni dd={0};
     uni tar={0};
-    for(i=0;i<N/4;i++){
+    for(i=0;i<K/4;i++){
         printf("u%d\n",und.d[i]);
+        vec v=i2v(und.d[i]);
+        vec vv={0};
+        for(int j=0;j<32;j++)
+        vv.x[j]=v.x[a[1].x[j]];        
+        dd.d[i]=v2i(vv);
+        /*
         for(int j=0;j<32;j++){
         dd.d[i]^=und.d[i]&ass.x[j];
         }
-        und.d[i]=rotr(dd.d[i],17);
-            printf("%b,\n",und.d[i]);
+        */
+        //und.d[i]=rotr(dd.d[i],17);
+            printf("%b,\n",dd.d[i]);
     }
 
-    for(i=0;i<N/4;i++){
+    for(i=0;i<K/4;i++){
+            vec v=i2v(dd.d[i]);
+            vec vv={0};
         for(int j=0;j<32;j++){
-            tar.d[i]^=und.d[i]&them.x[j];
+            vv.x[j]=v.x[inv_a[1].x[j]];
+            //tar.d[i]^=und.d[i]&them.x[j];
         }
-        tar.d[i]=rotr(tar.d[i],15);
+        tar.d[i]=v2i(vv);
+        //tar.d[i]=rotr(tar.d[i],15);
     }
     for(i=0;i<K;i++)
         printf("zz%d,\n",tar.c[inv_a[0].x[i]]);
@@ -2747,6 +2758,17 @@ for(i=1;i<K+1;i++)
     return sin;
 }
 
+int is_zero(vec a){
+    int i,flg=0;
+
+    for(i=0;i<N;i++){
+        if(a.x[i]!=0){
+            return 0;
+        }
+    }
+
+    return 1;
+}
 
 int main()
 {
@@ -2771,10 +2793,10 @@ int main()
     uni on={0};
 
     for(i=0;i<120;i++)
-    on.x[i]=i+1;
+    on.c[i]=i+1;
     coda(on);
     fugo();
-    //exit(1);
+    exit(1);
     
     vec L={0};
     //L=L2(); //keygen();
@@ -2793,18 +2815,48 @@ int main()
     //exit(1);
     vec vc=vmul(mm,g0,N);
     printpoln(vc);
-    mkerr(cc.x,T);
-    ymo o0=bm_itr(zind(vadd(cc,vc),L).x);
-    chen(o0.f);
+    //mkerr(cc.x,T);    
+    //ymo o0=bm_itr(zind(vadd(cc,vc),L).x);
+    //chen(o0.f);
+    //exit(1);
+    int mac=0b1111;
+    mac=m(mac,gol);
+    mac+=1;
+    printf("%b\n",syndrome[sind(mac)]);
     //exit(1);
 
+    
+    for(i=0;i<N;i++)
+    cc.x[i]=i%15;
     for(i=0;i<N;i++)
     vc.x[i]=m(vc.x[i],gol);
+    vec vd=vxor(vc,cc);
     for(i=0;i<N;i++)
-    vc.x[i]=v2i(bdiv(i2v(vc.x[i]),i2v(gol)));
-    vc=vdiv(vc,g0);
-    printpoln(vc);
+    printf("%b,",syndrome[sind(vd.x[i])]);
+    printf("\n");
     //exit(1);
+    for(i=0;i<N;i++)
+    vd.x[i]=vd.x[i]^syndrome[sind(vd.x[i])];
+
+    for(i=0;i<N;i++)
+    vd.x[i]=v2i(bdiv(i2v(vd.x[i]),i2v(gol)));
+    printf("is_zero=%d\n",is_zero(vd));
+    
+    //if(is_zero(vd)==1)
+    /*
+        ymo imo=bm_itr(zind(vd,L).x);
+        vec dx=chen(imo.f);
+        //exit(1);
+    
+    for(i=0;i<T;i++){
+        printf("%d,",dx.x[i]);
+        vd.x[dx.x[i]]^=15;
+    }
+    exit(1);
+    */
+    vc=vdiv(vd,g0);
+    printpoln(vc);
+    exit(1);
 
     vec c=vmul(mm,g0,N);
     printpoln(c);
