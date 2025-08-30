@@ -284,12 +284,12 @@ vec vand(vec a, vec b)
 // 多項式を項ずつ掛ける
 vec vterml(vec f, oterm t)
 {
-    // f = conv(f);
+    // f = convolution(f);
     // ssert(op_verify(f));
     int i;
     vec h = {0};
 
-    // f=conv(f);
+    // f=convolution(f);
     // k = deg (o2v(f));
 
     for (i = 0; i < DEG; i++)
@@ -478,10 +478,10 @@ vec xor(vec a,vec b){
     return c;
 }
 
-int wt(vec a){
+int wt(vec a,int n){
     int i=0,k=0;
 
-    for(i=0;i<23;i++){
+    for(i=0;i<n;i++){
     if(a.x[i]>0)
     k++;
     }
@@ -545,7 +545,7 @@ void fugo(void){
 
     
 
-    while(count[1]<4){
+    while(count[1]<1){
         l=rand()%23;
         if(r1.x[l]==0){
         r1.x[l]=1;
@@ -553,7 +553,7 @@ void fugo(void){
         }
         printf("a");
     }
-    while(count[2]<4){
+    while(count[2]<2){
         l=rand()%23;
         if(r2.x[l]==0){
         r2.x[l]=1;
@@ -572,16 +572,16 @@ void fugo(void){
 
     printf("\n");
 
-    vec s=xor(x,or(h,y)),rr=xor(r1,or(r2,h));
-    vec u=xor(r1,or(h,r2)),vv=xor(or(s,r2),e);
-    vec t=xor(vv,or(u,y));
+    vec s=xor(x,conv(h,y,23)),rr=xor(r1,conv(r2,h,23));
+    vec u=xor(r1,conv(h,r2,23)),vv=xor(conv(s,r2,23),e);
+    vec t=xor(vv,conv(u,y,23));
 
-    int n=wt(t),o=wt(xor(or(h,y),r2));
+    int n=wt(t,23),o=wt(xor(conv(h,y,23),r2),23);
 
-    if(n>0 && n<=3 && o>3 && wt(u)>3 && wt(vv)>3)
+    if(n>0 && n<=3 && o>3 && wt(u,23)>3 && wt(vv,23)>3)
     {
-        printf("wt(t)=%d wt(r)=%d wt(s)=%d,wt(u)=%d,wt(v)=%d\n",n,o,wt(s),wt(u),wt(vv));
-        printf("wr(x)=%d wt(h)=%d wt(r1)=%d,wt(r2)=%d,wt(y)=%d,wt(e)=%d\n",wt(x),wt(h),wt(r1),wt(r2),wt(y),wt(e));
+        printf("wt(t)=%d wt(r)=%d wt(s)=%d,wt(u)=%d,wt(v)=%d\n",n,o,wt(s,23),wt(u,23),wt(vv,23));
+        printf("wr(x)=%d wt(h)=%d wt(r1)=%d,wt(r2)=%d,wt(y)=%d,wt(e)=%d\n",wt(x,23),wt(h,23),wt(r1,23),wt(r2,23),wt(y,23),wt(e,23));
 
         printf("Pub_key=\n");
         printf("s= ");
@@ -636,11 +636,11 @@ void fugo(void){
             mm^=t.x[i];
             //printf("%d,",vv.x[i]);
         }
-        printf("%b\n",v2i(xor(vv,or(u,y))));
+        printf("%b\n",v2i(xor(vv,conv(u,y,23))));
         printf("\n");
         //exit(1);
         unsigned cipher=v2i(xor(i2v(enc(plain,gol)),vv));
-        unsigned cipher2=v2i(xor(i2v(cipher),or(u,y)));
+        unsigned cipher2=v2i(xor(i2v(cipher),conv(u,y,23)));
         unsigned decode=v2i(bdiv(i2v(cipher2^syndrome[sind(((cipher2)))]),i2v(gol)));
         unsigned w=0b11;
         
@@ -650,14 +650,14 @@ void fugo(void){
         printf("err=%b\n",mm);
         printf("decode=%b\n",decode);
         printf("times=%d\n",count[6]);
-        //exit(1);
+        break;
     }
         n=0;
         for(i=0;i<6;i++)
         count[i]=0;
         printf("('A`)\n");
         count[6]++;
-        break;
+        
     }
 
 
