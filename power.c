@@ -2796,7 +2796,7 @@ int main()
     on.c[i]=i+1;
     coda(on);
     fugo();
-    exit(1);
+    //exit(1);
     
     vec L={0};
     //L=L2(); //keygen();
