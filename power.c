@@ -2713,6 +2713,7 @@ vec L2(){
     return f;
 }
 
+
 vec L3(vec f){
     vec v={0};
     int i,count=0,l=0;
