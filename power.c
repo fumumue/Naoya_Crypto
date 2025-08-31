@@ -13,6 +13,7 @@
 
 #include "golay.c"
 #include "hqc_golay.c"
+#include "inv_mat.c"
 
 
 #define SEPARABLE 0
@@ -934,6 +935,7 @@ MTX inverseMatrix(MTX A, MTX A_inv, int start_row, int end_row)
 {
     int i, j, k;
     int temp;
+    MTX B=A;
 
     // 単位行列を初期化
     for (i = 0; i < K / 2; i++)
@@ -945,7 +947,7 @@ MTX inverseMatrix(MTX A, MTX A_inv, int start_row, int end_row)
     }
 
     // ガウス・ジョルダン法による逆行列の計算
-    for (k = start_row; k < end_row; k++)
+    for (k = 0; k < K/2+1; k++)
     {
         temp = A.x[k][k];
         for (j = 0; j < K / 2 + 1; j++)
@@ -953,7 +955,7 @@ MTX inverseMatrix(MTX A, MTX A_inv, int start_row, int end_row)
             A.x[k][j] = A.x[k][j] * oinv(temp, N) % N;
             A_inv.x[k][j] = A_inv.x[k][j] * oinv(temp, N) % N;
         }
-        for (i = start_row; i < end_row; i++)
+        for (i = 0; i < K/2+1; i++)
         {
             if (i != k)
             {
@@ -989,6 +991,124 @@ MTX inverseMatrix(MTX A, MTX A_inv, int start_row, int end_row)
         }
         printf("\n");
     }
+    printf("\n");
+    // exit(1);
+    
+    MTX C={0};
+    int s=0;
+    for(i=0;i<K/2;i++){
+        for(j=0;j<K/2;j++){
+            s=0;
+        for(k=0;k<K/2;k++)
+        s+=B.x[i][k]*A_inv.x[k][j]%N;
+        C.x[i][j]=s%N;
+        }
+    }
+    for(i=0;i<K/2;i++){
+        for(j=0;j<K/2;j++)
+        printf("c%d,",C.x[i][j]);
+    printf("\n");
+    }
+    printf("\n");
+    exit(1);
+
+    /*
+        x.x[0] = 1;
+
+        vec vv = {0};
+        OP pol = {0};
+        pol = setpol(x.x, K / 2 + 1);
+        printpol(o2v(pol));
+        printf(" ==key\n");
+        int key=0;
+        for (i = 0; i < N; i++)
+        {
+            // v.x[i] = 0;
+            if (trace(pol, i) % N == 0)
+            {
+                printf("error position=%d\n", i);
+                vv.x[key++] = i;
+            }
+        }
+        for (i = 0; i < K / 2; i++)
+        {
+            for (j = 0; j < K / 2 + 1; j++)
+                printf("%d,", A_inv.x[i][j]%N);
+            printf("\n");
+        }
+        // exit(1);
+      */
+    return A_inv;
+}
+
+// 行列の逆行列を計算する関数
+MTX inverseM(MTX A, MTX A_inv, int start_row, int end_row)
+{
+    int i, j, k;
+    int temp;
+
+    // 単位行列を初期化
+    for (i = 0; i < K / 2; i++)
+    {
+        for (j = 0; j < K / 2 + 1; j++)
+        {
+            A_inv.x[i][j] = (i == j) ? 1 : 0;
+        }
+    }
+
+    // ガウス・ジョルダン法による逆行列の計算
+    for (k = start_row; k < end_row; k++)
+    {
+        temp = A.x[k][k];
+        for (j = 0; j < K / 2 + 1; j++)
+        {
+            A.x[k][j] = A.x[k][j] * oinv(temp, N) % N;
+            A_inv.x[k][j] = A_inv.x[k][j] * oinv(temp, N) % N;
+        }
+        for (i = start_row; i < end_row; i++)
+        {
+            if (i != k)
+            {
+                temp = A.x[i][k] % N;
+                for (j = 0; j < K / 2 + 1; j++)
+                {
+                    A.x[i][j] -= (A.x[k][j] * temp) % N;
+                    A_inv.x[i][j] -= (A_inv.x[k][j] * temp) % N;
+                }
+            }
+        }
+    }
+    for(i=0;i<K;i++){
+        for(j=0;j<N;j++)
+        printf("%d,",A.x[i][j]);
+        printf("\n");
+    }
+   exit(1);
+    /*
+    vec x = {0};
+    for (i = 0; i < K / 2; i++)
+    {
+        if (N > A.x[i][K / 2])
+        {
+            x.x[K / 2 - i] = (N - A.x[i][K / 2]) % N;
+        }
+        else
+        {
+            x.x[K / 2 - i] = A.x[i][K / 2] % N;
+        }
+    }
+    for (int i = 0; i < K / 2; i++)
+    {
+        printf("in inverse ");
+        for (int j = 0; j < K / 2; j++)
+        {
+            if (A_inv.x[i][j] < 0)
+                A_inv.x[i][j] = N + A_inv.x[i][j]%N;
+            printf("%d ", A_inv.x[i][j]);
+        }
+        printf("\n");
+    }
+*/
     printf("\n");
     // exit(1);
 
@@ -1343,6 +1463,59 @@ int ben_or(vec f)
     }
 
     return 0;
+}
+
+void printMatrix(vec a)
+{
+	int i, k;
+	for(i = 0; i < N; i++){
+		for(k = 0; k < N; k++){
+			printf("%d ", a.x[i * N + k]);
+		}
+		putchar('\n');
+	}
+}
+
+
+
+#define SMAP(a, b)	(a != b && (a += b, b = a - b, a -= b))
+int determinant(vec m)
+{
+	int x, y, i;
+	int det = 1, r;
+
+	// 上三角行列に変換しつつ、対角成分の積を計算する。
+	for(y = 0; y < N - 1; y++){
+		printMatrix(m);
+		if(m.x[y * N + y] == 0){
+			// 対角成分が0だった場合は、その列の値が0でない行と交換する
+			for(i = y + 1; i < N; i++){
+				if(m.x[i * N + y] != 0){
+					break;
+				}
+			}
+			if(i < N){
+				for(x = 0; x < N; x++){
+					SMAP(m.x[i * N + x], m.x[y * N + x]);
+				}
+				// 列を交換したので行列式の値の符号は反転する。
+				det = -det;
+			}
+		}
+		for(i = y + 1; i < N; i++){
+			r = m.x[i * N + y] / m.x[y * N + y];
+			for(x = y; x < N; x++){
+				m.x[i * N + x] -= r * m.x[y * N + x];
+			}
+		}
+		det *= m.x[y * N + y];
+	}
+    printMatrix(m);
+    exit(1);
+
+	det *= m.x[y * N + y];
+
+	return det;
 }
 
 vec mkd(vec w, int kk)
@@ -2779,6 +2952,15 @@ int is_zero(vec a){
     return 1;
 }
 
+vec list(vec r){
+vec c={0},e={0};
+int i,j;
+unsigned R[32][257]={0};
+
+
+}
+
+
 int main()
 {
     int i, u = 0;
@@ -2801,6 +2983,14 @@ int main()
     int jj=1;
     uni on={0};
     vec a[2]={0},inv_a[2]={0};
+    MTX A={0},inv_A={0};
+
+    for(i=0;i<N;i++){
+        for(int j=0;j<N;j++)
+        A.x[i][j]=rand()%N;
+        }
+    matinv(A,&inv_A,17);
+    exit(1);
 
     for(i=0;i<N;i++)
     a[0].x[i]=i;
