@@ -2594,6 +2594,7 @@ vec keygen(){
 typedef union {
     unsigned long long int x[K/2];
     unsigned d[K];
+    unsigned short a[K*2];
     unsigned char c[K*4];
 } uni;
 
@@ -2622,7 +2623,7 @@ int vor(vec v){
     }
 }
 
-vec coda(uni on){
+uni coda(uni on,vec a1,vec a2){
     uni hola={0};
     int i;
 
@@ -2633,74 +2634,82 @@ vec coda(uni on){
 
     //for(i=0;i<K;i++)
     //    on.c[i]=i+1;
+    for(i=0;i<K;i++)
+    on.d[i]=rotr(on.d[i],17);
+    //vec a[8]={0},inv_a[8]={0};
+    //vec aa[30]={0},o[30]={0};
 
-    vec a[8]={0},inv_a[8]={0};
-    vec aa[30]={0},o[30]={0};
-
-for(i=0;i<K;i++)
-    a[0].x[i]=i;
-    for(i=0;i<32;i++)
-    a[1].x[i]=i;
-
-    random_shuffle(a[0].x,K);
-    random_shuffle(a[1].x,32);
-
-    for(i=0;i<K;i++){
-        printf("%d,",a[0].x[i]);
-    inv_a[0].x[a[0].x[i]]=i;
-    }
-    printf("\n");
     //exit(1);
-    for(i=0;i<32;i++)
-    inv_a[1].x[a[1].x[i]]=i;
+    /*
     vec ass={0},them={0};
     for(i=0;i<32;i++){
-        ass.x[i]=(1<<a[1].x[i]);
-        them.x[i]=(1<<inv_a[1].x[i]);
+        ass.x[i]=(1<<a.x[i]);
+        them.x[i]=(1<<inv_a.x[i]);
     }
-
+    */
     uni und={0};
+    for(i=0;i<K*4;i++)
+        und.c[i]=on.c[a1.x[i]];
     for(i=0;i<K;i++)
-        und.c[i]=on.c[a[0].x[i]];
-    for(i=0;i<K;i++)
-    printf("z%d,",und.c[i]);
+    printf("z%d,",und.d[i]);
     printf("\n");
-    for(i=0;i<K/4;i++)
+    for(i=0;i<K;i++)
     printf("%b\n,",und.d[i]);
     printf("\n");
+    uni dd={0};
+    uni tar={0};
+    for(i=0;i<K;i++){
+            vec v=i2v(und.d[i]);
+            vec vv={0};
+        for(int j=0;j<32;j++){
+            vv.x[j]=v.x[a2.x[j]];
+            //tar.d[i]^=und.d[i]&them.x[j];
+        }
+        tar.d[i]=v2i(vv);
+        //tar.d[i]=rotr(tar.d[i],17);
+    }
+    //exit(1);
+
+return tar;
+}
+
+
+uni koda(uni und,vec inv_a0,vec inv_a1){
+    uni hola={0};
+    int i;
+
+    for(i=0;i<N-1;i++)
+    printf("%d=%d\n",i,ink(mltn(i,3)));
+    printf("%d\n",v2i(i2v(rotr(1234,17))));
+    //exit(1);
+
+    for(i=0;i<K;i++)
+    printf("%b\n",und.d[i]);
     //exit(1);
 
     uni dd={0};
     uni tar={0};
-    for(i=0;i<K/4;i++){
-        printf("u%d\n",und.d[i]);
-        vec v=i2v(und.d[i]);
-        vec vv={0};
-        for(int j=0;j<32;j++)
-        vv.x[j]=v.x[a[1].x[j]];        
-        dd.d[i]=v2i(vv);
-        /*
-        for(int j=0;j<32;j++){
-        dd.d[i]^=und.d[i]&ass.x[j];
-        }
-        */
-        //und.d[i]=rotr(dd.d[i],17);
-            printf("%b,\n",dd.d[i]);
-    }
 
-    for(i=0;i<K/4;i++){
-            vec v=i2v(dd.d[i]);
+    //for(i=0;K/4;i++)
+    //tar.d[i]=rotr(tar.d[i],15);
+
+    for(i=0;i<K;i++){
+            vec v=i2v(und.d[i]);
             vec vv={0};
         for(int j=0;j<32;j++){
-            vv.x[j]=v.x[inv_a[1].x[j]];
+            vv.x[j]=v.x[inv_a1.x[j]];
             //tar.d[i]^=und.d[i]&them.x[j];
         }
         tar.d[i]=v2i(vv);
-        //tar.d[i]=rotr(tar.d[i],15);
     }
-    for(i=0;i<K;i++)
-        printf("zz%d,\n",tar.c[inv_a[0].x[i]]);
+    for(i=0;i<K*4;i++)    
+    dd.c[i]=tar.c[inv_a0.x[i]];
+    for(i=0;i<K;i++){
+    dd.d[i]=rotr(dd.d[i],15);
+    }
+    printf("\n");
 
+    return dd;
 }
 
 
@@ -2791,11 +2800,36 @@ int main()
     int nn=3;
     int jj=1;
     uni on={0};
+    vec a[2]={0},inv_a[2]={0};
 
-    for(i=0;i<120;i++)
-    on.c[i]=i+1;
-    coda(on);
-    fugo();
+    for(i=0;i<N;i++)
+    a[0].x[i]=i;
+    for(i=0;i<32;i++)
+    a[1].x[i]=i;
+
+    random_shuffle(a[0].x,K*4);
+    random_shuffle(a[1].x,32);
+
+    for(i=0;i<K*4;i++){
+        printf("%d,",a[0].x[i]);
+    inv_a[0].x[a[0].x[i]]=i;
+    }
+    for(i=0;i<32;i++)
+    inv_a[1].x[a[1].x[i]]=i;
+    
+    printf("\n");
+    for(i=0;i<K;i++)
+    on.a[i]=i+225;
+    //for(i=0;i<K;i++)
+    //on.d[i]=rotr(on.d[i],17);
+    on=coda(on,a[0],a[1]);
+    on=koda(on,inv_a[0],inv_a[1]);
+    printf("\n");
+    for(i=0;i<K;i++)
+    printf("%d,",on.a[i]);
+    printf("\n");
+    //on.d[i]=rotr(on.d[i],15);
+    //fugo();
     //exit(1);
     
     vec L={0};
@@ -2815,37 +2849,57 @@ int main()
     //exit(1);
     vec vc=vmul(mm,g0,N);
     printpoln(vc);
+    for(i=0;i<K;i++)
+    on.a[i]=vc.x[i];
+    on=coda(on,a[0],a[1]);
+    on=koda(on,inv_a[0],inv_a[1]);
+    vec ve={0};
+    for(i=0;i<K;i++){
+    ve.x[i]=on.a[i];
+    }
+    for(i=K;i<N;i++)
+    ve.x[i]=vc.x[i];
+    ve=vdiv(ve,g0);
+    printpoln(ve);
+    //exit(1);
+    /*
+    on=koda(on,inv_a[0],inv_a[1]);
+    for(i=0;i<K;i++)
+    vc.x[i]=on.d[i];
+    vc=vdiv(vc,g0);
+    printpoln(vc);
+    exit(1);
+    */
     //mkerr(cc.x,T);    
     //ymo o0=bm_itr(zind(vadd(cc,vc),L).x);
     //chen(o0.f);
     //exit(1);
-    int mac=0b1111;
-    mac=m(mac,gol);
-    mac+=1;
-    printf("%b\n",syndrome[sind(mac)]);
-    //exit(1);
 
     
-    for(i=0;i<N;i++)
-    cc.x[i]=i%15;
+    for(i=0;i<T;i++)
+    cc.x[i]=15;
     for(i=0;i<N;i++)
     vc.x[i]=m(vc.x[i],gol);
     vec vd=vxor(vc,cc);
+    /*
     for(i=0;i<N;i++)
     printf("%b,",syndrome[sind(vd.x[i])]);
     printf("\n");
     //exit(1);
     for(i=0;i<N;i++)
     vd.x[i]=vd.x[i]^syndrome[sind(vd.x[i])];
-
+    */
     for(i=0;i<N;i++)
-    vd.x[i]=v2i(bdiv(i2v(vd.x[i]),i2v(gol)));
-    printf("is_zero=%d\n",is_zero(vd));
-    
+    vc.x[i]=v2i(bdiv(i2v(vc.x[i]),i2v(gol)));
+    for(i=0;i<K;i++)
+    on.a[i]=vc.x[i];
+    on=koda(on,inv_a[0],inv_a[1]);
+    for(i=0;i<K;i++)
+    vd.x[i]=on.a[i];
     //if(is_zero(vd)==1)
     /*
-        ymo imo=bm_itr(zind(vd,L).x);
-        vec dx=chen(imo.f);
+        //ymo imo=bm_itr(zind(vd,L).x);
+        //vec dx=chen(imo.f);
         //exit(1);
     
     for(i=0;i<T;i++){
