@@ -2877,25 +2877,25 @@ int main()
 
     
     for(i=0;i<T;i++)
-    cc.x[i]=15;
+    cc.x[i]=6;
     for(i=0;i<N;i++)
     vc.x[i]=m(vc.x[i],gol);
     vec vd=vxor(vc,cc);
-    /*
+    
     for(i=0;i<N;i++)
     printf("%b,",syndrome[sind(vd.x[i])]);
     printf("\n");
     //exit(1);
     for(i=0;i<N;i++)
     vd.x[i]=vd.x[i]^syndrome[sind(vd.x[i])];
-    */
+    
     for(i=0;i<N;i++)
-    vc.x[i]=v2i(bdiv(i2v(vc.x[i]),i2v(gol)));
+    vc.x[i]=v2i(bdiv(i2v(vd.x[i]),i2v(gol)));
     for(i=0;i<K;i++)
     on.a[i]=vc.x[i];
     on=koda(on,inv_a[0],inv_a[1]);
-    for(i=0;i<K;i++)
-    vd.x[i]=on.a[i];
+    //for(i=0;i<K;i++)
+    //vd.x[i]=on.a[i];
     //if(is_zero(vd)==1)
     /*
         //ymo imo=bm_itr(zind(vd,L).x);
@@ -2908,7 +2908,7 @@ int main()
     }
     exit(1);
     */
-    vc=vdiv(vd,g0);
+    vc=vdiv(vc,g0);
     printpoln(vc);
     exit(1);
 
