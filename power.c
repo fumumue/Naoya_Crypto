@@ -14,7 +14,7 @@
 #include "golay.c"
 #include "hqc_golay.c"
 #include "inv_mat.c"
-#include "gauss.c"
+
 
 #define SEPARABLE 0
 #define MATRIX_SIZE K
@@ -2986,21 +2986,19 @@ int main()
     MTX A={0},inv_A={0};
 
     srand(clock());
-    for(i=0;i<4;i++){
-        for(int j=0;j<4+1;j++)
+    for(i=0;i<K;i++){
+        for(int j=0;j<K+1;j++)
         A.x[i][j]=rand()%N;
         }
  MTA B={0.};
-    for(i=0;i<4;i++){
-        for(int j=0;j<4+1;j++)
+    for(i=0;i<K;i++){
+        for(int j=0;j<K+1;j++)
         B.x[i][j]=rand()%N;
     }
 
-    matinv(A,&inv_A,4);
-    renritu(A,4);
-    triangle(A,&inv_A,4);
-    sankaku(A,4);
-    gauss(3);
+    matinv(A,&inv_A,K);
+    renritu(A,K);
+    sankaku(A,K);
     //exit(1);
 
     for(i=0;i<N;i++)
@@ -3018,9 +3016,9 @@ int main()
     for(i=0;i<32;i++)
     inv_a[1].x[a[1].x[i]]=i;
     
-    printf("\n");
+    printf("ooky\n");
     for(i=0;i<K;i++)
-    on.a[i]=i+225;
+    on.a[i]=i+3;
     //for(i=0;i<K;i++)
     //on.d[i]=rotr(on.d[i],17);
     on=coda(on,a[0],a[1]);
@@ -3038,11 +3036,11 @@ int main()
     for(i=0;i<K;i++)
     L.x[i]=i+1;
     g0=L3(L);
-    //for(i=0;i<K;i++)
-    //L.x[i]=i+1;
-    for(i=0;i<K/2-1;i++)
-    mm.x[i]=17;
+    for(i=0;i<K/2;i++)
+    mm.x[i]=3;
     mm.x[K/2]=1;
+    printpoln(mm);
+    //exit(1);
 
     int y=m(0b11111111,gol);
     int p=v2i(bdiv(i2v(y),i2v(gol)));

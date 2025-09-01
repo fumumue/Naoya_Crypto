@@ -157,8 +157,10 @@ unsigned long long  gcd(unsigned long long  a, unsigned long long  b)
 unsigned long long  inv(unsigned long long  a, unsigned long long  n)
 {
 
+    if(a==0)
+    return 0;
     if(gcd(a,n)!=1){
-        printf("(a,n)!=1\n");
+        printf("(a,n)!=1:%lld %lld\n",a,n);
         return -1;
     }
     unsigned long long  d = n;

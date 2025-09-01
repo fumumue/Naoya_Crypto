@@ -575,35 +575,54 @@ random_shuffle(x0,SIZE_OF_ARRAY(x0));
 }
 
 
-
-//#define NN 16
-
+// self sankaku
 vec renritu(MTX a, int n)
 {
   unsigned short p, d;
   int i, j, k;
   vec v={0};
  
+  for(i=0;i<K;i++){
+    for(j=0;j<K+1;j++)
+    printf("%d,",a.x[i][j]);
+  printf("\n");
+  }
+  printf("\n");
+  
   for (i = 0; i < n; i++) {
     p = a.x[i][i];
- 
-    for (j = 0; j < (n + 1); j++) {
+    a.x[i][i]=(a.x[i][i]*inv(p,N))%N;
+    if(p==0){
+      printf("Uh! 0\n");
+      exit(1);
+    }
+    for (j = i+1; j < (n + 1); j++) {
       a.x[i][j] = a.x[i][j]*inv(p,N)%N;
     }
- 
-    for (j = 0; j < n; j++) {
+    //上三角
+    for (j = i+1; j < n; j++) {
       if (i != j) {
         d = a.x[j][i];
  
         for (k = i; k < (n + 1); k++) {
-          a.x[j][k] = (a.x[j][k] + d*a.x[i][k])%N;
+          a.x[j][k] = (N+(a.x[j][k] - d*a.x[i][k])%N)%N;
+        }
+      }
+    }
+    //下三角
+    for (j = i+1; j > -1; j--) {
+      if (i != j) {
+        d = a.x[j][i];
+ 
+        for (k = i; k < (n + 1); k++) {
+          a.x[j][k] = (N+(a.x[j][k] - d*a.x[i][k])%N)%N;
         }
       }
     }
   }
  for(i=0;i<n;i++){
   if(a.x[i][i]!=1)
-    exit(1);
+    printf("v= %d,%d\n",a.x[i][i], i);
   for(j=0;j<n+1;j++)
   printf("%d,",a.x[i][j]);
   printf("\n");
@@ -616,6 +635,64 @@ vec renritu(MTX a, int n)
     printf(" x%d = %d\n", i , v.x[i]);
   }
  
+  return v;
+}
+
+// self sankaku
+vec sankaku(MTX a, int n)
+{
+  unsigned short p, d;
+  int i, j, k;
+  vec v={0};
+ 
+  for(i=0;i<K;i++){
+    for(j=0;j<K+1;j++)
+    printf("%d,",a.x[i][j]);
+  printf("\n");
+  }
+  printf("\n");
+  
+  for (i = 0; i < n; i++) {
+    p = a.x[i][i];
+    a.x[i][i]=(a.x[i][i]*inv(p,N))%N;
+    if(p==0){
+      printf("Uh! 0\n");
+      exit(1);
+    }
+    for (j = i+1; j < (n + 1); j++) {
+      a.x[i][j] = a.x[i][j]*inv(p,N)%N;
+    }
+    //上三角
+    for (j = i+1; j < n; j++) {
+      if (i != j) {
+        d = a.x[j][i];
+ 
+        for (k = i; k < (n + 1); k++) {
+          a.x[j][k] = (N+(a.x[j][k] - d*a.x[i][k])%N)%N;
+        }
+      }
+    }
+    /*
+    //下三角
+    for (j = i+1; j > -1; j--) {
+      if (i != j) {
+        d = a.x[j][i];
+ 
+        for (k = i; k < (n + 1); k++) {
+          a.x[j][k] = (N+(a.x[j][k] - d*a.x[i][k])%N)%N;
+        }
+      }
+    }
+    */
+  }
+
+  for(i=0;i<n;i++){
+    for(j=0;j<n+1;j++)
+    printf("%d,",a.x[i][j]);
+  printf("\n");
+  }
+  printf("\n");
+
   return v;
 }
 
