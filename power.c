@@ -3095,6 +3095,8 @@ int main()
     for(i=0;i<K;i++)
     on.a[i]=vc.x[i];
     on=koda(on,inv_a[0],inv_a[1]);
+    //exit(1);
+
     //for(i=0;i<K;i++)
     //vd.x[i]=on.a[i];
     //if(is_zero(vd)==1)
@@ -3111,7 +3113,7 @@ int main()
     */
     vc=vdiv(vc,g0);
     printpoln(vc);
-    exit(1);
+    //exit(1);
 
     vec c=vmul(mm,g0,N);
     printpoln(c);
