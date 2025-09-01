@@ -14,7 +14,7 @@
 #include "golay.c"
 #include "hqc_golay.c"
 #include "inv_mat.c"
-
+#include "gauss.c"
 
 #define SEPARABLE 0
 #define MATRIX_SIZE K
@@ -2985,12 +2985,15 @@ int main()
     vec a[2]={0},inv_a[2]={0};
     MTX A={0},inv_A={0};
 
-    for(i=0;i<N;i++){
-        for(int j=0;j<N;j++)
+    srand(clock());
+    for(i=0;i<4;i++){
+        for(int j=0;j<4+1;j++)
         A.x[i][j]=rand()%N;
         }
-    matinv(A,&inv_A,17);
-    exit(1);
+    matinv(A,&inv_A,4);
+    renritu(A,4);
+    triangle(A,&inv_A,4);
+    //exit(1);
 
     for(i=0;i<N;i++)
     a[0].x[i]=i;

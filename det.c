@@ -4,10 +4,13 @@
 #include <stdint.h>
 
 //#include "8192.h"
-#include "global.h"
+#include "global-p.h"
 #include "struct.h"
-#include "chash.h"
-#include "gf.h"
+#include "chash-p.c"
+//#include "debug.c"
+#include "ecole.c"
+#include <assert.h>
+
 
 #define L 3 //配列の次数
 
@@ -156,7 +159,7 @@ unsigned short inv(unsigned short a, unsigned short n)
 /*
     Fisher-Yates shuffle による方法
     配列の要素をランダムシャッフルする
-*/
+
 void random_shuffle(unsigned short *array, size_t size)
 {
     unsigned short u;
@@ -169,6 +172,7 @@ void random_shuffle(unsigned short *array, size_t size)
         SWAP(unsigned int, array[a], array[b]);
     }
 }
+*/
 
 int dt[16][17];
 int dt2[16][17];
@@ -984,6 +988,54 @@ int ben_or(OP f)
 
 
     return 0;
+}
+
+void printMatrix(double *a)
+{
+	int i, k;
+	for(i = 0; i < N; i++){
+		for(k = 0; k < N; k++){
+			printf("%+6.2f ", a[i * N + k]);
+		}
+		putchar('\n');
+	}
+}
+
+#define SMAP(a, b)	(a != b && (a += b, b = a - b, a -= b))
+int determinant(int*m)
+{
+	int x, y, i;
+	int det = 1, r;
+
+	// 上三角行列に変換しつつ、対角成分の積を計算する。
+	for(y = 0; y < N - 1; y++){
+		printMatrix(m);
+		if(m[y * N + y] == 0){
+			// 対角成分が0だった場合は、その列の値が0でない行と交換する
+			for(i = y + 1; i < N; i++){
+				if(m[i * N + y] != 0){
+					break;
+				}
+			}
+			if(i < N){
+				for(x = 0; x < N; x++){
+					SMAP(m[i * N + x], m[y * N + x]);
+				}
+				// 列を交換したので行列式の値の符号は反転する。
+				det = -det;
+			}
+		}
+		for(i = y + 1; i < N; i++){
+			r = m[i * N + y] / m[y * N + y];
+			for(x = y; x < N; x++){
+				m[i * N + x] -= r * m[y * N + x];
+			}
+		}
+		det *= m[y * N + y];
+	}
+	det *= m[y * N + y];
+
+	return det;
 }
 
 
