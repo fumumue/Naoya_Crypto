@@ -2990,9 +2990,17 @@ int main()
         for(int j=0;j<4+1;j++)
         A.x[i][j]=rand()%N;
         }
+ MTA B={0.};
+    for(i=0;i<4;i++){
+        for(int j=0;j<4+1;j++)
+        B.x[i][j]=rand()%N;
+    }
+
     matinv(A,&inv_A,4);
     renritu(A,4);
     triangle(A,&inv_A,4);
+    sankaku(A,4);
+    gauss(3);
     //exit(1);
 
     for(i=0;i<N;i++)

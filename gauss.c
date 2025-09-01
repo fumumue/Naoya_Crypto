@@ -1,68 +1,140 @@
 # include <stdio.h>
+#include <assert.h>
+#include <time.h>
+#include <stdlib.h>
 
 
-# define EN  3   //the dimension of equation
+//# define nn  3   //the dimnnsion of equation
 
-void vec_diff(int a[EN], int b[EN]){
-    /* Calcurate the difference of two vectors. Be caution that b[N] changes.*/
-    for (int i = 0; i < EN; i++){
-        b[i] = (N+(b[i]-a[i])%N)%N;
+//#include "hqc_golay.c"
+void vec_diff(int a[N], int b[N],int nn){
+    /* Calcurate the differnnce of two vectors. Be caution that b[N] changes.*/
+    for (int i = 0; i < nn; i++){
+        b[i] = (N+b[i]-a[i])%N;
     }
 }
 
-int gauss(){
-    int m[EN][EN] = {{5,N-1,N-1}, {2,1,N-3},{1,1,1}};    // The matrix
-    int b[EN] = {0,N-5,6};
 
+int sankaku(MTX m,int nn){
+    int mm[3][4] = {{5,1,1,1}, {2,1,3,2},{1,1,1,3}};    // The matrix
+    int b[3] = {0,5,6};
+    int i,j;
 
-    printf("The coefficient matrix is : \n");
-    for (int i = 0; i < EN; i++){
-        for (int j = 0; j < EN; j++){
-            printf("%d ", m[i][j]);
-            if (j == EN-1){
+    
+    printf("The coefficinnt matrix is : \n");
+    for (int i = 0; i < nn; i++){
+        for (int j = 0; j < nn+1; j++){
+            printf("%d ", m.x[i][j]);
+            if (j == nn){
                 printf("\n");
             }
         }
     }
 
     printf("\nUse Gauss method to solve equations : \n");
-    for (int i = 0; i < EN; i++){
-        for (int j = i+1; j < EN; j++){
-            int coef = m[j][i] * inv(m[i][i],N)%N;
-            int del[EN];
+    //上三角
+    for (int i = 0; i < nn; i++){
+        for (int j = i+1; j < nn; j++){
+            int coef = m.x[j][i] * inv(m.x[i][i],N);
+            int del[nn];
 
-            for (int k = 0; k < EN; k++){
-                del[k] = m[i][k] * coef%N;
+            for (int k = 0; k < nn; k++){
+                del[k] = m.x[i][k] * coef%N;
             }
-            vec_diff(del, m[j]);
-            b[j] = (N-b[j]%N-b[i] * coef%N)%N;
+            vec_diff(del, m.x[j],nn);
+            b[j] = (N+b[j]-b[i] * coef)%N;
         }
     }
-
-    for (int i = EN -1; i >= 0; i--){
-        int x = 1*inv(m[i][i],N)%N;
-        m[i][i] = m[i][i]*x%N;
+    
+    for (int i = 0; i <nn; i++){
+        int x =  inv(m.x[i][i],N);
+        m.x[i][i] = (m.x[i][i]*x)%N;
         b[i] = b[i]*x%N;
-
+        for(j=i+1;j<nn+1;j++)
+        m.x[i][j]=m.x[i][j]*x%N;
+        /*
+        //下三角
         for (int j = 0; j < i; j++){
-            b[j] = (N+b[j]%N-b[i]*m[j][i]%N)%N;
+            b[i] -= b[j]*m[j][i];
             m[j][i] = 0;
         }
+            */
     }
+    
+    
 
-    for (int i = 0; i < EN; i++){
-        for (int j = 0; j < EN; j++){
-            printf("%d ", (N+m[i][j]%257)%N);
-            if (j == EN - 1){
+    for (int i = 0; i < nn; i++){
+        for (int j = 0; j < nn+1; j++){
+            printf("%d ", m.x[i][j]);
+            if (j == nn){
+                printf("\n");
+            }
+        }
+    }
+    printf("\n");
+
+
+    return 0;
+}
+
+void vdiff(float a[3], float b[3],int nn){
+    /* Calcurate the difference of two vectors. Be caution that b[N] changes.*/
+    for (int i = 0; i < nn; i++){
+        b[i] -= a[i];
+    }
+}
+int gauss(int nn){
+    float m[3][3] = {{5,-1,-1}, {2,1,-3},{1,1,1}};    // The matrix
+    float b[3] = {0,-5,6};
+
+
+    printf("The coefficient matrix is : \n");
+    for (int i = 0; i < nn; i++){
+        for (int j = 0; j < nn; j++){
+            printf("%1.f ", m[i][j]);
+            if (j == nn-1){
                 printf("\n");
             }
         }
     }
 
-    for (int i = 0; i < EN; i++){
-        printf("%d ", (N+b[i]%257)%N);
+    printf("\nUse Gauss method to solve equations : \n");
+    for (int i = 0; i < nn; i++){
+        for (int j = i+1; j < nn; j++){
+            float coef = m[j][i] / m[i][i];
+            float del[N];
+
+            for (int k = 0; k < nn; k++){
+                del[k] = m[i][k] * coef;
+            }
+            vdiff(del, m[j],nn);
+            b[j] -= b[i] * coef;
+        }
     }
-    printf("%d\n",N);
+
+    for (int i = nn -1; i >= 0; i--){
+        float x = 1. / m[i][i];
+        m[i][i] *= x;
+        b[i] *= x;
+
+        for (int j = 0; j < i; j++){
+            b[j] -= b[i]*m[j][i];
+            m[j][i] = 0;
+        }
+    }
+
+    for (int i = 0; i < nn; i++){
+        for (int j = 0; j < nn; j++){
+            printf("%1.f ", m[i][j]);
+            if (j == nn - 1){
+                printf("\n");
+            }
+        }
+    }
+
+    for (int i = 0; i < nn; i++){
+        printf("%f ", b[i]);
+    }
 
     return 0;
 }

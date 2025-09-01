@@ -50,3 +50,12 @@ typedef struct {
   int flg;
 } MTX;
 
+
+typedef struct {
+   float x[N][N];
+  OP f;
+  int row; //行
+  int col; //列
+  int flg;
+} MTA;
+

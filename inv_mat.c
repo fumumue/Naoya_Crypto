@@ -14,7 +14,7 @@
 #define MAXN 4
 //#define N 256 //order of GF(q)
 #define F K *E // dimension of matrix
-#define LL 16
+#define LL 4
 
 /*
 // elements of GF16
@@ -71,6 +71,84 @@ int Inv(unsigned short b)
 
   return -1;
 }
+
+
+MTX gauss2(MTX a)
+{
+  int i, j, k, buf = 0;
+  unsigned short ff = 0, inv_a[F][F] = {0};
+  MTX TT = {0}, b;
+  b = a;
+  // unsigned short a[F][F]={0};
+  //\92P\88ʍs\97\F1\82\F0\8D\EC\82\E9
+  for (i = 0; i < LL; i++)
+  {
+    for (j = 0; j < LL; j++)
+    {
+      inv_a[i][j] = (i == j) ? 1 : 0;
+    }
+  }
+  //\91|\82\AB\8Fo\82\B5\96@
+  for (i = 0; i < LL; i++)
+  {
+    buf = Inv(a.x[i][i]);
+    for (j = 0; j < LL; j++)
+    {
+      a.x[i][j] = a.x[i][j]*buf%N;
+      inv_a[i][j] = inv_a[i][j]*buf%N;
+    }
+    for (j = 0; j < LL; j++)
+    {
+      if (i != j)
+      {
+        buf = a.x[j][i];
+        for (k = 0; k < LL; k++)
+        {
+          a.x[j][k] -= a.x[i][k]*buf%N;
+          inv_a[j][k] -= inv_a[i][k]*buf%N;
+        }
+      }
+    }
+  }
+
+  //\8Bt\8Ds\97\F1\82\F0\8Fo\97\CD
+  for (i = 0; i < LL; i++)
+  {
+    printf("{");
+    for (j = 0; j < LL; j++)
+    {
+      printf(" %d,", inv_a[i][j]);
+      TT.x[i][j] = inv_a[i][j];
+    }
+    printf("},\n");
+  }
+
+  for (i = 0; i < LL; i++)
+  {
+    for (j = 0; j < LL; j++)
+    {
+      for (k = 0; k < LL; k++)
+        ff += TT.x[i][k] * b.x[k][j]%N;
+      TT.x[i][j] = ff;
+    }
+  }
+  for (i = 0; i < LL; i++)
+  {
+    for (j = 0; j < LL; j++)
+      printf("%d,", TT.x[i][j]);
+    printf("\n");
+  }
+//exit(1);
+  for(i=0;i<LL;i++){
+    for(j=0;j<LL;j++)
+    printf("%d,",inv_a[i][j]);
+  printf("\n");
+  }
+  //exit(1);
+
+  return TT;
+}
+
 
 // inverse matrix
 int matinv(MTX a, MTX *inv, int n)
@@ -311,8 +389,8 @@ int triangle(MTX a, MTX *inv, int n)
         buf = a.x[j][i];
         for (k = 0; k < n+1; k++)
         {
-          a.x[j][k] = N+a.x[j][k]-(a.x[i][k]*buf)%N;
-          inv_a[j][k] = N+inv_a[j][k]-(inv_a[i][k]*buf)%N;
+          a.x[j][k] = (N+(a.x[j][k]-(a.x[i][k]*buf)%N))%N;
+          inv_a[j][k] = (N+inv_a[j][k]-(inv_a[i][k]*buf)%N)%N;
 
         }
         
