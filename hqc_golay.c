@@ -504,7 +504,7 @@ x^=j[i];
 return x;
 }
 
-void fugo(void){
+void main(void){
     int k=12,i,count[10]={0},l=0;
     vec x={0},h={0},r1={0},r2={0},y={0};
     vec a={1,2,3};
