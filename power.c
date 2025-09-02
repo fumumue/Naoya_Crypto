@@ -2764,13 +2764,6 @@ vec keygen(){
 }
 
 
-typedef union {
-    unsigned long long int x[K/2];
-    unsigned d[K];
-    unsigned short a[K*2];
-    unsigned char c[K*4];
-} uni;
-
 /**
  * struct state - represents the 320-bit state of ascon
  *
@@ -2795,6 +2788,7 @@ int vor(vec v){
     }
     }
 }
+
 
 uni coda(uni on,vec a1,vec a2){
     uni hola={0};
@@ -2960,6 +2954,80 @@ unsigned R[32][257]={0};
 
 }
 
+void cipher(){
+    int i,j;
+    uni on={0};
+    vec mv={0},us={0};
+    vec g0={0},a[2]={0},inv_a[2]={0};
+    unsigned gol=0b101011100011;
+    
+    vec L={0};
+    //L=L2(); //keygen();
+    for(i=0;i<K;i++)
+    L.x[i]=i+1;
+    g0=L3(L);
+
+
+    for(i=0;i<K*4;i++)
+    a[0].x[i]=i;
+    for(i=0;i<32;i++)
+    a[1].x[i]=i;
+
+    random_shuffle(a[0].x,K*4);
+    random_shuffle(a[1].x,32);
+
+    for(i=0;i<K*4;i++){
+        printf("%d,",a[0].x[i]);
+    inv_a[0].x[a[0].x[i]]=i;
+    }
+    for(i=0;i<32;i++)
+    inv_a[1].x[a[1].x[i]]=i;
+
+        printf("ooky\n");
+
+    printf("ooky\n");
+    for(i=0;i<K/2;i++)
+    mv.x[i]=on.d[i]=i+3;
+    mv=vmul(mv,g0,N);
+    printpoln(mv);
+    //exit(1);
+    //for(i=0;i<K;i++)
+    //on.d[i]=mm.x[i]; //rotr(on.d[i],17);
+    for(i=0;i<K;i++)
+    on.d[i]=mv.x[i]; //=v2i(vdiv(i2v(mm.x[i]),i2v(gol)));
+    on=coda(on,a[0],a[1]);
+/*
+    vec cc={0};
+    for(i=0;i<K*4;i++)
+    cc.x[i]=m(on.c[i],gol);
+    printf("y&t=");
+    printpoln(cc);
+    //exit(1);
+    for(i=0;i<K*4;i++)
+    on.c[i]=v2i(bdiv(i2v(cc.x[i]),i2v(gol)));
+    printf("\n");
+    //printpoln(us);
+    int y=m(0b11111111,gol);
+    int p=v2i(bdiv(i2v(y),i2v(gol)));
+    printf("%b \n",p);
+    //exit(1);
+*/
+    on=koda(on,inv_a[0],inv_a[1]);
+    printf("\n");
+    //for(i=0;i<K;i++)
+    //us.x[i]=v2i(vdiv(i2v(on.d[i]),i2v(gol)));
+
+    for(i=0;i<K;i++)
+    us.x[i]=on.d[i];
+    us=vdiv(us,g0);
+    for(i=0;i<K/2;i++)
+    printf("%d,",us.x[i]);
+    printf("\n");
+    //on.d[i]=rotr(on.d[i],15);
+    //fugo();
+    //exit(1);
+}
+
 
 int main()
 {
@@ -3001,24 +3069,9 @@ int main()
     sankaku(A,K);
     //exit(1);
 
-    for(i=0;i<N;i++)
-    a[0].x[i]=i;
-    for(i=0;i<32;i++)
-    a[1].x[i]=i;
+    //cipher();
+    //exit(1);
 
-    random_shuffle(a[0].x,K*4);
-    random_shuffle(a[1].x,32);
-
-    for(i=0;i<K*4;i++){
-        printf("%d,",a[0].x[i]);
-    inv_a[0].x[a[0].x[i]]=i;
-    }
-    for(i=0;i<32;i++)
-    inv_a[1].x[a[1].x[i]]=i;
-    
-    printf("ooky\n");
-    for(i=0;i<K;i++)
-    on.a[i]=i+3;
     //for(i=0;i<K;i++)
     //on.d[i]=rotr(on.d[i],17);
     on=coda(on,a[0],a[1]);
@@ -3060,7 +3113,7 @@ int main()
     ve.x[i]=vc.x[i];
     ve=vdiv(ve,g0);
     printpoln(ve);
-    //exit(1);
+    exit(1);
     /*
     on=koda(on,inv_a[0],inv_a[1]);
     for(i=0;i<K;i++)

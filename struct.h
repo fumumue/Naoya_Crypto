@@ -17,6 +17,8 @@ typedef struct
 typedef struct 
 {
    unsigned int x[DEG]; //配列の添字を次数に、配列の値を係数に持つ多項式の表現
+   unsigned short a[DEG*2];
+   unsigned char c[DEG*4];
 } vec;
 
 typedef struct {
@@ -58,4 +60,11 @@ typedef struct {
   int col; //列
   int flg;
 } MTA;
+
+typedef union {
+    unsigned long long int x[K/2];
+    unsigned d[K];
+    unsigned short a[K*2];
+    unsigned char c[K*4];
+} uni;
 

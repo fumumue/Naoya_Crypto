@@ -7,7 +7,7 @@
 //を表す。ここではDは符号長にしている。
 #define N 257 // set small prime ex. p=2053
 #define M N// puncture code
-#define K (4) // degree of polynomial
+#define K (16) // degree of polynomial
 #define E (9)   // bit size of prime
 #define DEG 1024 // set (K * E) < N
 #define T (K / 2) // weight of error vector
