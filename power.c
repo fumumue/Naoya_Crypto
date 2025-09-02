@@ -2794,11 +2794,12 @@ uni coda(uni on,vec a1,vec a2){
     uni hola={0};
     int i;
 
+    /*
     for(i=0;i<N-1;i++)
     printf("%d=%d\n",i,ink(mltn(i,3)));
     printf("%d\n",v2i(i2v(rotr(1234,17))));
     //exit(1);
-
+    */
     //for(i=0;i<K;i++)
     //    on.c[i]=i+1;
     for(i=0;i<K;i++)
@@ -2845,11 +2846,12 @@ uni koda(uni und,vec inv_a0,vec inv_a1){
     uni hola={0};
     int i;
 
+    /*
     for(i=0;i<N-1;i++)
     printf("%d=%d\n",i,ink(mltn(i,3)));
     printf("%d\n",v2i(i2v(rotr(1234,17))));
     //exit(1);
-
+    */
     for(i=0;i<K;i++)
     printf("%b\n",und.d[i]);
     //exit(1);
@@ -2916,7 +2918,7 @@ vec L3(vec f){
         break;
     }
     g0.x[0]=1;
-    for(i=0;i<K;i++)
+    for(i=0;i<K/2;i++)
     g0=vmul(g0,ff[i],N);
 
     return g0;
@@ -2963,7 +2965,7 @@ void cipher(){
     
     vec L={0};
     //L=L2(); //keygen();
-    for(i=0;i<K;i++)
+    for(i=0;i<K/2;i++)
     L.x[i]=i+1;
     g0=L3(L);
 
@@ -2983,7 +2985,6 @@ void cipher(){
     for(i=0;i<32;i++)
     inv_a[1].x[a[1].x[i]]=i;
 
-        printf("ooky\n");
 
     printf("ooky\n");
     for(i=0;i<K/2;i++)
@@ -2996,7 +2997,7 @@ void cipher(){
     for(i=0;i<K;i++)
     on.d[i]=mv.x[i]; //=v2i(vdiv(i2v(mm.x[i]),i2v(gol)));
     on=coda(on,a[0],a[1]);
-/*
+
     vec cc={0};
     for(i=0;i<K*4;i++)
     cc.x[i]=m(on.c[i],gol);
@@ -3011,17 +3012,18 @@ void cipher(){
     int p=v2i(bdiv(i2v(y),i2v(gol)));
     printf("%b \n",p);
     //exit(1);
-*/
+
     on=koda(on,inv_a[0],inv_a[1]);
     printf("\n");
     //for(i=0;i<K;i++)
     //us.x[i]=v2i(vdiv(i2v(on.d[i]),i2v(gol)));
 
-    for(i=0;i<K;i++)
+    for(i=0;i<K*2;i++)
     us.x[i]=on.d[i];
     us=vdiv(us,g0);
+    printpoln(us);
     for(i=0;i<K/2;i++)
-    printf("%d,",us.x[i]);
+    printf("u%d,",us.x[i]);
     printf("\n");
     //on.d[i]=rotr(on.d[i],15);
     //fugo();
@@ -3052,6 +3054,24 @@ int main()
     uni on={0};
     vec a[2]={0},inv_a[2]={0};
     MTX A={0},inv_A={0};
+    
+
+
+    for(i=0;i<K*4;i++)
+    a[0].x[i]=i;
+    for(i=0;i<32;i++)
+    a[1].x[i]=i;
+
+    random_shuffle(a[0].x,K*4);
+    random_shuffle(a[1].x,32);
+
+    for(i=0;i<K*4;i++){
+        printf("%d,",a[0].x[i]);
+    inv_a[0].x[a[0].x[i]]=i;
+    }
+    for(i=0;i<32;i++)
+    inv_a[1].x[a[1].x[i]]=i;
+
 
     srand(clock());
     for(i=0;i<K;i++){
@@ -3069,16 +3089,18 @@ int main()
     sankaku(A,K);
     //exit(1);
 
-    //cipher();
+    cipher();
     //exit(1);
 
     //for(i=0;i<K;i++)
     //on.d[i]=rotr(on.d[i],17);
+    for(i=0;i<K;i++)
+    on.d[i]=i+1;
     on=coda(on,a[0],a[1]);
     on=koda(on,inv_a[0],inv_a[1]);
     printf("\n");
     for(i=0;i<K;i++)
-    printf("%d,",on.a[i]);
+    printf("%d,",on.d[i]);
     printf("\n");
     //on.d[i]=rotr(on.d[i],15);
     //fugo();
@@ -3086,7 +3108,7 @@ int main()
     
     vec L={0};
     //L=L2(); //keygen();
-    for(i=0;i<K;i++)
+    for(i=0;i<K/2;i++)
     L.x[i]=i+1;
     g0=L3(L);
     for(i=0;i<K/2;i++)
