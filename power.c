@@ -1920,13 +1920,6 @@ vec chen(vec f)
     return e;
 }
 
-typedef struct
-{
-    vec f;
-    vec g;
-    vec h;
-} ymo;
-
 
 vec bms( int s[])
 {
@@ -2661,15 +2654,10 @@ vec ev3(vec x,vec v)
 }
 
 
-typedef struct {
-    vec g;
-    vec h;
-} fair;
-
-fair soka(){
+ymo soka(){
     int i;
     vec g[K]={0},h[N-K]={0},mod={0},gg={0},hh={0};
-    fair kubi={0};
+    ymo kubi={0};
 
     gg.x[0]=1;
     hh.x[0]=1;
@@ -3035,7 +3023,7 @@ int main()
 {
     int i, u = 0;
     int s[K + 1] = {0}, z1[N] = {0};
-    fair ff20={0};
+    //fair ff20={0};
     unsigned gol=0b101011100011;
 
 

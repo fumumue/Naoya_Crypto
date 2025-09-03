@@ -69,7 +69,10 @@ typedef union {
 } uni;
 
 
-typedef struct {
+typedef struct
+{
+    vec f;
     vec g;
     vec h;
-} fair;
+} ymo;
+
