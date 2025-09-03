@@ -13,7 +13,7 @@
 
 #include "golay.c"
 #include "hqc_golay.c"
-
+#include "inv_mat.c"
 
 #define SEPARABLE 0
 #define MATRIX_SIZE K
@@ -2488,11 +2488,6 @@ vec ev3(vec x,vec v)
 }
 
 
-typedef struct {
-    vec g;
-    vec h;
-} fair;
-
 fair soka(){
     int i;
     vec g[K]={0},h[N-K]={0},mod={0},gg={0},hh={0};
@@ -2591,20 +2586,10 @@ vec keygen(){
 }
 
 
-/**
- * struct state - represents the 320-bit state of ascon
- *
- * @x: array containing the five 64-bit registers of the state
- */
-struct state {
-	uint64_t x[5];
-};
-
 static inline unsigned rotr(uint32_t x, uint8_t n)
 {
 	return x >> n | x << (32 - n);
 }
-
 
 
 int vor(vec v){
@@ -2708,74 +2693,6 @@ uni koda(uni und,vec inv_a0,vec inv_a1){
 }
 
 
-vec coda2(uni on){
-    uni hola={0};
-    int i;
-
-    for(i=0;i<N-1;i++)
-    printf("%d=%d\n",i,ink(mltn(i,3)));
-    printf("%d\n",v2i(i2v(rotr(1234,17))));
-    //exit(1);
-
-    for(i=0;i<120;i++)
-        on.c[i]=i+1;
-
-    vec a[8]={0},inv_a[8]={0};
-    vec aa[30]={0},o[30]={0};
-
-for(i=0;i<120;i++)
-    a[0].x[i]=i;
-    for(i=0;i<32;i++)
-    a[1].x[i]=i;
-
-    random_shuffle(a[0].x,120);
-    random_shuffle(a[1].x,32);
-    for(i=0;i<120;i++){
-        printf("%d,",a[0].x[i]);
-    inv_a[0].x[a[0].x[i]]=i;
-    }
-    printf("\n");
-    //exit(1);
-    for(i=0;i<32;i++)
-    inv_a[1].x[a[1].x[i]]=i;
-
-    uni und={0};
-    for(i=0;i<120;i++)
-        und.c[i]=on.c[a[0].x[i]];
-    for(i=0;i<120;i++)
-    printf("%d,",und.c[i]);
-    printf("\n");
-    for(i=0;i<30;i++)
-    printf("%b\n,",und.d[i]);
-    printf("\n");
-    //exit(1);
-
-    uni dd={0};
-    uni tar[30]={0};
-    vec bo[30]={0};
-    for(i=0;i<30;i++){
-        printf("z%d\n",und.d[i]);
-        aa[i]=i2v(rotr(und.d[i],17));
-        for(int j=0;j<32;j++){
-            tar[i].c[j]=aa[i].x[a[1].x[j]];
-            //printf("%d,",aa[i].x[j]);
-        }
-        //dd.d[i]=v2i(tar[i]);
-        //printf("\n");
-    }
-    uni ao={0};
-    for(i=0;i<30;i++){
-        for(int j=0;j<32;j++){
-            bo[i].x[j]=tar[i].c[inv_a[1].x[j]];
-        }
-        ao.d[i]=rotr(v2i((bo[i])),15);
-        printf("zz%d,\n",ao.d[i]);
-    }    
-    //exit(1);
-
-}
-
-
 vec zind(vec e){
 int i;
 vec sin={0};
@@ -2819,7 +2736,7 @@ vec L3(vec f){
         ff[count].x[0]=N-mltn(f.x[count],3);
         ff[count++].x[1]=1;
         
-        if(count==K)
+        if(count==K/2)
         break;
     }
     g0.x[0]=1;
@@ -2828,7 +2745,6 @@ vec L3(vec f){
 
     return g0;
 }
-
 
 
 
@@ -2914,33 +2830,23 @@ int main()
     int s[K + 1] = {0}, z1[N] = {0};
     fair ff20={0};
     unsigned gol=0b101011100011;
-
-
-    vec v = {2,4,0,1}, x={30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
-    //{30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
-    vec f = {1,0,1,30,30,1,30,0,1,1,30,30,0,1};
-    vec g = {1,0,30,30,0,1,1,0,30,1,30,1,0,30};
-    vec h={0},ff={1,2,3}; //{40,0,1,1,40,0,1},gg={37,2,40,21,31,26,8};
-    vec t = {4,29,16,6,11,21,18,30,16,28,24,12,15,9,20,21};
-    vec vv = {0},m0={1,0,1,0,1,0,1,0,1,0,0,0,1,0,1},I={0},II={1,0,1,-1,-1,1,-1,0,1,1,-1,-1,0,1,0,0,0},I2={Q-1,1,1,0,Q-1,0,1,0,0,1,Q-1,0,0,0,0,0,0},I3={31,1,1,0,31,0,1,0,0,1,31,0,0,0,0,0,0},J={0,0,0,0,2};
-    vec xx={5,9,6,16,4,15,16,22,20,18,30};
+    vec x={0};
     vec us={0},mm={0},cc={0};
     vec gg[K+1]={0},g0={0};
     int nn=3;
     int jj=1;
     uni on={0};
 
-    for(i=0;i<120;i++)
+
+    for(i=0;i<K;i++)
     on.x[i]=i+1;
-    //coda(on);
-    //exit(1);
 
     cipher();
-    exit(1);
+    //exit(1);
     
     g0=keygen();
 
-    for(i=0;i<K/2-1;i++)
+    for(i=0;i<K/2;i++)
     mm.x[i]=17;
     mm.x[K/2]=1;
 
@@ -3057,89 +2963,6 @@ int main()
     //van(K);
     //mkd(g0, K);
 
-    while (1)
-    {
-        // for(i=0;i<T;i++)
-        // z1[i]=2;
-        memset(z1, 0, sizeof(z1));
-        // mkerr(z1, T);    // generate error vector
-        for (int i = 0; i < T; i++)
-            z1[i] = i+1;
-        vec dd={0};
-        //exit(1);
-        x = synd(err.x, K); // calc syndrome
-        printpoln(x);
-        for(i=0;i<K;i++)
-            dd.x[K-i-1]=x.x[i];//trace(vadd(err,c),K-i);
-        //d=synd(err.x,K);
-        printpol(dd);
-        printf(" un0\n");
-        //printpoln(vx);
-        //exit(1);
-        
-        //vec r={2,4,2,1};
-        //vec r = bms(x.x);    // Berlekamp-Massey Algorithm
-        for(i=0;i<K;i++)
-        v.x[K-i-1]=x.x[i];
-        printpoln(v);
-        //exit(1);
-        ymo y=bm_itr(sin.x);
-        //for(i=0;i<T;i++)
-        //v.x[K-1-i]=y.f.x[i];
-        x=chen(y.f);
-        //chen(r);
-        //exit(1);
-         for(i=0;i<M;i++){
-         if(z1[i]>0)
-         printf("i=%d %d\n",i,z1[i]);
-         }
-         //exit(1);
-         // mkd(1);
-
-        printpol((v));
-        printf(" ==synpol\n");
-
-        //sol と bm_itr は同じだけど bm のほうが早い
-         /*
-        MTX b = {0};
-        for (i = 0; i < K / 2; i++)
-        {
-            for (int j = 0; j < K / 2 + 1; j++)
-            {
-                b.x[i][j] = v.x[i + j];
-                // printf("%d,",b.x[i][i+j]);
-            }
-            // printf("\n");
-        }
-        printf("\n");
-        for (i = 0; i < K / 2; i++)
-        {
-            for (int j = 0; j < K / 2 + 1; j++)
-                printf("e%d,", b.x[i][j]);
-            printf("\n");
-        }
-
-        x = sol(b, 0, K / 2);
-        */
-
-        x=ev(x,v);
-        //exit(1);
-        int flg = 0,yo=0;
-        for (i = 0; i < N; i++)
-        {
-            if (err.x[i] > 0)
-            {
-                printf("(correcting ,original) = (%d, %d) %d\n", x.x[yo], err.x[i], i);
-                yo++;
-                flg++;
-            }
-        }
-
-        if (flg == T)
-            break;
-
-        break;
-    }
     return 0;
 }
 
