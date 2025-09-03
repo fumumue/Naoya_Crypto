@@ -2591,12 +2591,6 @@ vec keygen(){
 }
 
 
-typedef union {
-    unsigned long long int x[15];
-    unsigned d[30];
-    unsigned int c[120];
-} uni;
-
 /**
  * struct state - represents the 320-bit state of ascon
  *
@@ -2622,7 +2616,99 @@ int vor(vec v){
     }
 }
 
-vec coda(uni on){
+uni coda(uni on,vec a1,vec a2){
+    uni hola={0};
+    int i;
+
+    /*
+    for(i=0;i<N-1;i++)
+    printf("%d=%d\n",i,ink(mltn(i,3)));
+    printf("%d\n",v2i(i2v(rotr(1234,17))));
+    //exit(1);
+    */
+    //for(i=0;i<K;i++)
+    //    on.c[i]=i+1;
+    for(i=0;i<K;i++)
+    on.d[i]=rotr(on.d[i],17);
+    //vec a[8]={0},inv_a[8]={0};
+    //vec aa[30]={0},o[30]={0};
+
+    //exit(1);
+    /*
+    vec ass={0},them={0};
+    for(i=0;i<32;i++){
+        ass.x[i]=(1<<a.x[i]);
+        them.x[i]=(1<<inv_a.x[i]);
+    }
+    */
+    uni und={0};
+    for(i=0;i<K*4;i++)
+        und.c[i]=on.c[a1.x[i]];
+    for(i=0;i<K;i++)
+    printf("z%d,",und.d[i]);
+    printf("\n");
+    for(i=0;i<K;i++)
+    printf("%b\n,",und.d[i]);
+    printf("\n");
+    uni dd={0};
+    uni tar={0};
+    for(i=0;i<K;i++){
+            vec v=i2v(und.d[i]);
+            vec vv={0};
+        for(int j=0;j<32;j++){
+            vv.x[j]=v.x[a2.x[j]];
+            //tar.d[i]^=und.d[i]&them.x[j];
+        }
+        tar.d[i]=v2i(vv);
+        //tar.d[i]=rotr(tar.d[i],17);
+    }
+    //exit(1);
+
+return tar;
+}
+
+
+uni koda(uni und,vec inv_a0,vec inv_a1){
+    uni hola={0};
+    int i;
+
+    /*
+    for(i=0;i<N-1;i++)
+    printf("%d=%d\n",i,ink(mltn(i,3)));
+    printf("%d\n",v2i(i2v(rotr(1234,17))));
+    //exit(1);
+    */
+    for(i=0;i<K;i++)
+    printf("%b\n",und.d[i]);
+    //exit(1);
+
+    uni dd={0};
+    uni tar={0};
+
+    //for(i=0;K/4;i++)
+    //tar.d[i]=rotr(tar.d[i],15);
+
+    for(i=0;i<K;i++){
+            vec v=i2v(und.d[i]);
+            vec vv={0};
+        for(int j=0;j<32;j++){
+            vv.x[j]=v.x[inv_a1.x[j]];
+            //tar.d[i]^=und.d[i]&them.x[j];
+        }
+        tar.d[i]=v2i(vv);
+    }
+    for(i=0;i<K*4;i++)    
+    dd.c[i]=tar.c[inv_a0.x[i]];
+    for(i=0;i<K;i++){
+    dd.d[i]=rotr(dd.d[i],15);
+    }
+    printf("\n");
+
+    return dd;
+}
+
+
+vec coda2(uni on){
     uni hola={0};
     int i;
 
@@ -2701,6 +2787,127 @@ for(i=1;i<K+1;i++)
 }
 
 
+vec L2(){
+    vec v={0};
+    int i,count=0,l=0;
+    vec L={0};
+    vec f={0},ff[K]={0};
+    vec g0={0};
+
+    while(1){
+        l=rand()%N;
+        if(L.x[l]==0 && l>0){
+            f.x[count++]=l;
+            L.x[l]=1;
+        }
+        if(count==K)
+        break;
+    }
+
+    return f;
+}
+
+
+vec L3(vec f){
+    vec v={0};
+    int i,count=0,l=0;
+    vec L={0};
+    vec ff[K]={0};
+    vec g0={0};
+
+    while(1){
+        ff[count].x[0]=N-mltn(f.x[count],3);
+        ff[count++].x[1]=1;
+        
+        if(count==K)
+        break;
+    }
+    g0.x[0]=1;
+    for(i=0;i<K/2;i++)
+    g0=vmul(g0,ff[i],N);
+
+    return g0;
+}
+
+
+
+
+void cipher(){
+    int i,j;
+    uni on={0};
+    vec mv={0},us={0};
+    vec g0={0},a[2]={0},inv_a[2]={0};
+    unsigned gol=0b101011100011;
+    
+    vec L={0};
+    //L=L2(); //keygen();
+    for(i=0;i<K/2;i++)
+    L.x[i]=i+1;
+    g0=L3(L);
+
+
+    for(i=0;i<K*4;i++)
+    a[0].x[i]=i;
+    for(i=0;i<32;i++)
+    a[1].x[i]=i;
+
+    random_shuffle(a[0].x,K*4);
+    random_shuffle(a[1].x,32);
+
+    for(i=0;i<K*4;i++){
+        printf("%d,",a[0].x[i]);
+    inv_a[0].x[a[0].x[i]]=i;
+    }
+    for(i=0;i<32;i++)
+    inv_a[1].x[a[1].x[i]]=i;
+
+
+    printf("ooky\n");
+    for(i=0;i<K/2;i++)
+    mv.x[i]=on.d[i]=i+3;
+    mv=vmul(mv,g0,N);
+    printpoln(mv);
+    //exit(1);
+    //for(i=0;i<K;i++)
+    //on.d[i]=mm.x[i]; //rotr(on.d[i],17);
+    for(i=0;i<K;i++)
+    on.d[i]=mv.x[i]; //=v2i(vdiv(i2v(mm.x[i]),i2v(gol)));
+    on=coda(on,a[0],a[1]);
+
+    vec cc={0};
+    for(i=0;i<K*4;i++)
+    cc.x[i]=m(on.c[i],gol);
+    printf("y&t=");
+    printpoln(cc);
+    //exit(1);
+    for(i=0;i<K*4;i++)
+    on.c[i]=v2i(bdiv(i2v(cc.x[i]),i2v(gol)));
+    printf("\n");
+    //printpoln(us);
+    int y=m(0b11111111,gol);
+    int p=v2i(bdiv(i2v(y),i2v(gol)));
+    printf("%b \n",p);
+    //exit(1);
+
+    on=koda(on,inv_a[0],inv_a[1]);
+    printf("\n");
+    //for(i=0;i<K;i++)
+    //us.x[i]=v2i(vdiv(i2v(on.d[i]),i2v(gol)));
+
+    for(i=0;i<K*2;i++)
+    us.x[i]=on.d[i];
+    us=vdiv(us,g0);
+    printpoln(us);
+    for(i=0;i<K/2;i++)
+    printf("u%d,",us.x[i]);
+    printf("\n");
+    //on.d[i]=rotr(on.d[i],15);
+    //fugo();
+    //exit(1);
+}
+
+
+
 int main()
 {
     int i, u = 0;
@@ -2728,6 +2935,9 @@ int main()
     //coda(on);
     //exit(1);
 
+    cipher();
+    exit(1);
+    
     g0=keygen();
 
     for(i=0;i<K/2-1;i++)
